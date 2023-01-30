@@ -7,7 +7,7 @@ DAMM is a full solution script for ARMA 3 that provides wide management over min
 
 video demo: soon!
 
-Doc: https:// pdf file here soon!
+Doc: https://github.com/aldolammel/Arma-3-Drag-Area-Markers-Minefields-Script/blob/main/drag-area-markers-minefields.Malden/DAMMinefields/_DAMM_Script_Documentation.pdf
 
 __
 
