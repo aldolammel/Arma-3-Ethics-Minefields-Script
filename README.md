@@ -13,8 +13,14 @@ __
 
 ## SCRIPT DETAILS
 
-- xxxx
-- xxxx
+- Drag and drop a marker on Eden to create a full and unique minefield;
+- Ethics control (ON/OFF) to avoid planting mines through civilian zones;
+- Topography control (ON/OFF) to avoid rock clusters, water, and mountains;
+- Set (or not) for each minefield which faction is its owner;
+- Set for each minefield a doctrine: Anti-personnel, Anti-material, or hybrid;
+- Set for the minefield’s mines amount intensity: low, mid, high, or extreme;
+- Friendly error handling;
+- Full debug monitor for mission editors;
 - Full documentation available.
 
 __
