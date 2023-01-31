@@ -1,4 +1,4 @@
-# Arma 3 / ETHICS Minefields v1.0
+# Arma 3 / ETHICS Minefields v1.1
 >*Dependencies: none.*
 
 ETHICS is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions.
@@ -32,6 +32,10 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/241257-rele
 __
 
 ## CHANGELONG
+
+**Jan, 31st 2023 | v1.1**
+
+- Demo map changed from Malden to Altis;
 
 **Jan, 30th 2023 | v1.0**
 
