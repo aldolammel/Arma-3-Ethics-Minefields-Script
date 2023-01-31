@@ -27,7 +27,7 @@ __
 
 ## IDEA AND FIX?
 
-Discussion and known issues: https soon.
+Discussion and known issues: https://forums.bohemia.net/forums/topic/241257-release-ethics-minefields/
 
 __
 
