@@ -1,7 +1,7 @@
-# Arma 3 / DAMM: Drag Area Markers Minefields v1.0
+# Arma 3 / ETHICS Minefields v1.0
 >*Dependencies: none.*
 
-DAMM is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions.
+ETHICS is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions.
 
 ## HOW TO INSTALL / DOCUMENTATION
 
