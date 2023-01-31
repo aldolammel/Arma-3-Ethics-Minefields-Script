@@ -37,6 +37,7 @@ __
 **Jan, 31st 2023 | v1.1**
 
 - Demo map changed from Malden to Altis;
+- Documentation has been updated.
 
 **Jan, 30th 2023 | v1.0**
 
