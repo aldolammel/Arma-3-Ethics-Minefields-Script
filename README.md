@@ -16,7 +16,8 @@ __
 - Drag and drop a marker on Eden to create a full and unique minefield;
 - Ethics control (ON/OFF) to avoid planting mines through civilian zones;
 - Topography control (ON/OFF) to avoid rock clusters and mountains;
-- Landmines will never be planted under water;
+- Also it works with naval mines for naval minefield;
+- Landmines won't be planted in water / Navalmines never out of water;
 - Set (or not) for each minefield which faction is its owner;
 - Set for each minefield a doctrine: Anti-personnel, Anti-material, or hybrid;
 - Set for the minefield’s mines amount intensity: low, mid, high, or extreme;
