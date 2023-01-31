@@ -34,8 +34,10 @@ __
 
 ## CHANGELONG
 
-**Jan, 31st 2023 | v1.1**
+**Jan, 31st 2023 | v1.2**
 
+- Now naval minefields are available;
+- Some functions improvements;
 - Demo map changed from Malden to Altis;
 - Documentation has been updated.
 
