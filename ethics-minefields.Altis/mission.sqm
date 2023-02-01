@@ -8,7 +8,7 @@ class EditorData
 	toggles=1537;
 	class ItemIDProvider
 	{
-		nextID=26;
+		nextID=28;
 	};
 	class MarkerIDProvider
 	{
@@ -16,14 +16,14 @@ class EditorData
 	};
 	class LayerIndexProvider
 	{
-		nextID=5;
+		nextID=7;
 	};
 	class Camera
 	{
 		pos[]={13675.256,39.27203,20042.029};
-		dir[]={-0.33575153,-0.28799698,-0.89684373};
-		up[]={-0.10097355,0.95763135,-0.26971579};
-		aside[]={-0.93652296,-7.4505806e-009,0.35060626};
+		dir[]={-0.10331751,-0.23105386,-0.96744007};
+		up[]={-0.024535876,0.97294039,-0.22974791};
+		aside[]={-0.9943468,-9.1822585e-009,0.10619114};
 	};
 };
 binarizationWanted=0;
@@ -127,7 +127,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=7;
+		items=8;
 		class Item0
 		{
 			dataType="Layer";
@@ -535,38 +535,26 @@ class Mission
 		class Item2
 		{
 			dataType="Marker";
-			position[]={12088.553,0,22949.184};
-			name="mf_ap_1";
-			markerType="ELLIPSE";
-			type="";
-			a=919.4342;
-			b=919.4342;
-			id=4;
-			atlOffset=2.3372927;
-		};
-		class Item3
-		{
-			dataType="Marker";
-			position[]={10347.532,256.784,19060.361};
-			name="mf_hy_opf_1";
+			position[]={10323.305,121.242,19059.16};
+			name="mf_am_blu_1";
 			markerType="ELLIPSE";
 			type="";
 			a=1125.896;
 			b=1125.896;
 			id=5;
-			atlOffset=130.97528;
+			atlOffset=-4.8605118;
 		};
-		class Item4
+		class Item3
 		{
 			dataType="Marker";
 			position[]={4598.084,0,23723.807};
 			name="marker-script-version";
-			text="    VERSION JAN, 31st 2023    (C)";
+			text="    VERSION FEB, 1st 2023";
 			type="mil_box";
 			id=23;
 			atlOffset=165.30959;
 		};
-		class Item5
+		class Item4
 		{
 			dataType="Logic";
 			class PositionInfo
@@ -633,17 +621,41 @@ class Mission
 				nAttributes=4;
 			};
 		};
-		class Item6
+		class Item5
 		{
 			dataType="Marker";
-			position[]={14889.977,6.5339999,22785.641};
+			position[]={14645.071,10.981,22750.652};
 			name="mf_nam_ind_1";
 			markerType="ELLIPSE";
 			type="";
 			a=1145.657;
 			b=1145.657;
 			id=25;
-			atlOffset=0.00035524368;
+			atlOffset=-2.5086679;
+		};
+		class Item6
+		{
+			dataType="Marker";
+			position[]={9537.5947,-4.572,21897.566};
+			name="mf_ap_opf_1";
+			markerType="ELLIPSE";
+			type="";
+			a=1086.663;
+			b=1086.663;
+			id=26;
+			atlOffset=-23.952337;
+		};
+		class Item7
+		{
+			dataType="Marker";
+			position[]={7418.5996,157.12622,17147.145};
+			name="mf_am_1";
+			markerType="ELLIPSE";
+			type="";
+			a=790.57288;
+			b=790.57288;
+			id=27;
+			atlOffset=-0.78805542;
 		};
 	};
 };

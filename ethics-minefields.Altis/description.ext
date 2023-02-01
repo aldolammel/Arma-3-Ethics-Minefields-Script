@@ -3,7 +3,7 @@ class Header
 {
 	gameType 			= Sandbox; 	
 	minPlayers			= 1;		
-	maxPlayers			= 1;
+	maxPlayers			= 3;
 };
 
 	// About
@@ -14,7 +14,7 @@ class Header
 
 	// Gameplay
 	joinUnassigned 		= 0;
-	respawnButton 		= 0;
+	respawnButton 		= 1;
 	respawnDialog 		= 0;
 	debriefing 			= 0;
 	saving 				= 0;
@@ -43,5 +43,5 @@ cba_settings_hasSettingsFile = 0;
 class cfgFunctions 
 {
 	// ETHICS MINEFIELDS:
-	#include "ETHICSMinefields\THY_ETHICS_functions.hpp"
+	#include "ETHICSMinefields\THY_ETH_functions.hpp"
 };
