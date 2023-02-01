@@ -21,7 +21,7 @@ __
 - Set (or not) for each minefield which faction is its owner;
 - Set for each minefield a doctrine: Anti-personnel, Anti-material, or hybrid;
 - Set for the minefield’s mines amount intensity: low, mid, high, or extreme;
-- Option for AM doctrine plants its mines only on roads.
+- Option for AM doctrine plants its mines only on roads;
 - Friendly error handling;
 - Full debug monitor for mission editors;
 - Full documentation available.
@@ -40,7 +40,7 @@ __
 
 - Added the option to make AM doctrine plants its mines only on roads and streets;
 - Some functions improvements;
-- Documentation has been completelly updated (with images).
+- Documentation has been completely updated (with images).
 
 **Jan, 31st 2023 | v1.2**
 
