@@ -7,7 +7,7 @@ ETHICS is a full solution script for ARMA 3 that provides wide management over m
 
 video demo: soon!
 
-Doc: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/ethics-minefields.Altis/ETHICSMinefields/_ETHICS_Script_Documentation.pdf
+Doc: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/ethics-minefields.Altis/ETHICSMinefields/_ETH_Script_Documentation.pdf
 
 __
 
