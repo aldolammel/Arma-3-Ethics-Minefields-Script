@@ -10,6 +10,9 @@ if (!hasInterface) exitWith {};  // all players clients and player host can read
 
 
 [] spawn {
-	// Let's see if this player should see some minefield:
-	[ETHICS_confirmedMfMarkers, ETHICS_prefix, ETHICS_spacer, ETHICS_visibleOnMap, ETHICS_styleColor, ETHICS_styleBrush, ETHICS_styleAlpha] call THY_fnc_ETHICS_markers_visibility;
+	// Check if the main script file is okay to keep going:
+	if ( ETHICS_landMinesDoctrines OR ETHICS_navalMinesDoctrines ) then {
+		// Let's see if this player should see some minefield:
+		[ETHICS_confirmedMfMarkers, ETHICS_prefix, ETHICS_spacer, ETHICS_visibleOnMap, ETHICS_styleColor, ETHICS_styleBrush, ETHICS_styleAlpha] call THY_fnc_ETHICS_markers_visibility;
+	};
 };

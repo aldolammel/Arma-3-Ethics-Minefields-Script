@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1
+// ETHICS MINEFIELDS v1.2
 // File: your_mission\ETHICSMinefields\fn_ETHICS_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -41,6 +41,7 @@ THY_fnc_ETHICS_minefields_scanner = {
 	params ["_prefix", "_spacer"];
 	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_1", "_confirmedMfMarkers", "_confirmedMfUnknownMarkers", "_confirmedMfFactionMarkers", "_possibleMinefieldMarkers", "_mfNameStructure", "_mfDoctrine", "_mfFaction", "_isNumber"];
 
+	// Declarations:
 	_realPrefix = _prefix + _spacer;
 	_acceptableShapes = ["RECTANGLE", "ELLIPSE"];
 	// Debug txts:
@@ -86,7 +87,7 @@ THY_fnc_ETHICS_minefields_scanner = {
 				// Check if the last session of the area marker name is numeric:
 				_isNumber = [_mfNameStructure, _x, _prefix, _spacer] call THY_fnc_ETHICS_marker_name_session_number;
 				// If all validations alright:
-				if ( _isNumber ) then { _confirmedMfUnknownMarkers append [_x] };
+				if ( (_mfDoctrine != "") AND _isNumber ) then { _confirmedMfUnknownMarkers append [_x] };
 			};
 			// Case example: mf_ap_ind_2
 			case 4: { 
@@ -97,7 +98,7 @@ THY_fnc_ETHICS_minefields_scanner = {
 				// Check if the last session of the area marker name is numeric:
 				_isNumber = [_mfNameStructure, _x, _prefix, _spacer] call THY_fnc_ETHICS_marker_name_session_number;
 				// If all validations alright:
-				if ( _isNumber ) then { _confirmedMfFactionMarkers append [_x] };
+				if ( (_mfDoctrine != "") AND _isNumber ) then { _confirmedMfFactionMarkers append [_x] };
 			};
 		};
 	} forEach _possibleMinefieldMarkers;
@@ -113,45 +114,70 @@ THY_fnc_ETHICS_minefields_scanner = {
 };
 
 
+THY_fnc_ETHICS_available_doctrines = {
+	// This function just checks and returns which doctrines are available for the mission.
+	// Returns _allDoctrinesAvailable: array [list of strings]
+
+	params ["_isOnDoctrinesLand", "_isOnDoctrinesNaval"];
+	private ["_doctrinesLand", "_doctrinesNaval", "_allDoctrinesAvailable"];
+
+	// Debug txts:
+	//private _txtDebugHeader = "ETHICS DEBUG >";
+	//private _txtWarningHeader = "ETHICS WARNING >";
+	// Initial values:
+	_doctrinesLand = [];
+	_doctrinesNaval = [];
+	// Checking the available doctrines:
+	if ( _isOnDoctrinesLand ) then { _doctrinesLand = ["AP", "AM", "HY"] };
+	if ( _isOnDoctrinesNaval ) then { _doctrinesNaval = ["NAM"] };
+	// Merging all available doctrines to return:
+	_allDoctrinesAvailable = _doctrinesLand + _doctrinesNaval;
+	// Return:
+	_allDoctrinesAvailable;
+};
+
+
+
 THY_fnc_ETHICS_marker_name_session_doctrine = {
 	// This function checks the second session (mandatory) of the area marker's name, validating if the session is a valid ammunition doctrine;
-	// Returns _doctrine: string.
+	// Returns _mfDoctrine: string.
 
 	params ["_mfNameStructure", "_mf"];
-	private ["_txtWarningHeader", "_doctrine"];
+	private ["_txtWarningHeader", "_allDoctrinesAvailable", "_mfDoctrine"];
 
 	// Debug txts:
 	//private _txtDebugHeader = "ETHICS DEBUG >";
 	_txtWarningHeader = "ETHICS WARNING >";
-	// Doctrine validation:
-	_doctrine = toUpper (_mfNameStructure select 1);
-	if ( !(_doctrine in ["AP", "AM", "HY"]) ) then {
-		systemChat format ["%1 Minefield '%2' > The doctrine tag looks wrong. There's no any '%3' doctrine. To avoid this error, for this specific minefield it was changed to AP.", _txtWarningHeader, _mf, _doctrine];
-		_doctrine = "AP";
+	// Checking the available doctrines:
+	_allDoctrinesAvailable = [ETHICS_landMinesDoctrines, ETHICS_navalMinesDoctrines] call THY_fnc_ETHICS_available_doctrines;
+	_mfDoctrine = toUpper (_mfNameStructure select 1);  // if mission editor doesn't typed uppercase, this fixes it.
+	if ( !(_mfDoctrine in _allDoctrinesAvailable) ) then {
+		systemChat format ["%1 Minefield '%2' > The doctrine tag looks wrong. There's no any '%3' doctrine available. Fix the marker variable name or check the available doctrines on fn_ETHICS_management.sqf.", _txtWarningHeader, _mf, _mfDoctrine];
+		_mfDoctrine = "";
 	}; 
 	// Return:
-	_doctrine;
+	_mfDoctrine;
 };
 
 
 THY_fnc_ETHICS_marker_name_session_faction = {
 	// This function checks the optional session of the area marker's name, validating if the session is a valid faction;
-	// Returns _faction: string.
+	// Returns _mfFaction: string.
 
 	params ["_mfNameStructure", "_mf"];
-	private ["_txtWarningHeader", "_faction"];
+	private ["_txtWarningHeader", "_mfFaction"];
 
 	// Debug txts:
 	//private _txtDebugHeader = "ETHICS DEBUG >";
 	_txtWarningHeader = "ETHICS WARNING >";
 	// Faction validation:
-	_faction = toUpper (_mfNameStructure select 2);
-	if ( !(_faction in ["BLU", "OPF", "IND"]) ) then {
-		systemChat format ["%1 Minefield '%2' > The faction tag looks wrong. There's no '%3' option. For this minefield owner, it was changed to unknown.", _txtWarningHeader, _mf, _faction];
-		_faction = "";
+	_mfFaction = toUpper (_mfNameStructure select 2);
+	if ( !(_mfFaction in ["BLU", "OPF", "IND"]) ) then {
+		systemChat format ["%1 Minefield '%2' > The faction tag looks wrong. There's no '%3' option. For this minefield owner, it was changed to unknown.", _txtWarningHeader, _mf, _mfFaction];
+		_mfFaction = "";
 	};
 	// Return:
-	_faction;
+	_mfFaction;
 };
 
 
@@ -182,7 +208,7 @@ THY_fnc_ETHICS_style = {
 	// This function set the minefield stylish on mission map.
 	// Returns Nothing.
 
-	params ["_debug",  "_minefield", "_prefix", "_spacer", "_isVisible", "_color", "_brush"];
+	params ["_debug",  "_mf", "_prefix", "_spacer", "_isVisible", "_color", "_brush"];
 	private ["_colorToOthers", "_mfFaction", "_mfNameStructure"];
 
 	// Declaration:
@@ -192,7 +218,7 @@ THY_fnc_ETHICS_style = {
 	// Debug mode ON:
 	if ( _debug ) then {
 		// check if the marker name has more than one _spacer character in its string composition:
-		_mfNameStructure = [_minefield, _prefix, _spacer] call THY_fnc_ETHICS_marker_name_splitter;
+		_mfNameStructure = [_mf, _prefix, _spacer] call THY_fnc_ETHICS_marker_name_splitter;
 		// Case by case, check the valid marker name's amounts of strings:
 		switch ( count _mfNameStructure ) do {
 			// Case example: mf_ap_1
@@ -213,8 +239,8 @@ THY_fnc_ETHICS_style = {
 		};
 	};
 	// Debug mode OFF:
-	_minefield setMarkerColorLocal _color;  // https://community.bistudio.com/wiki/Arma_3:_CfgMarkerColors
-	_minefield setMarkerBrushLocal _brush;  // https://community.bistudio.com/wiki/setMarkerBrush
+	_mf setMarkerColorLocal _color;  // https://community.bistudio.com/wiki/Arma_3:_CfgMarkerColors
+	_mf setMarkerBrushLocal _brush;  // https://community.bistudio.com/wiki/setMarkerBrush
 	// Return:
 	true;
 };
@@ -255,7 +281,7 @@ THY_fnc_ETHICS_shape_symmetry = {
 	// This function checks the area shape symmetry of the minefield built by the Mission Editor through Eden. It's important to make the work of THY_fnc_ETHICS_mine_planter easier.
 	// Returns nothing.
 
-	params ["_minefield"];
+	params ["_mf"];
 	private ["_txtWarningHeader", "_radiusMin", "_radiusMax", "_mfWidth", "_mfHeight"];
 
 	// Debug txts:
@@ -264,29 +290,29 @@ THY_fnc_ETHICS_shape_symmetry = {
 	_radiusMin = 25;
 	_radiusMax = 2500;
 	// Minefield dimensions:
-	_mfWidth = markerSize _minefield select 0;
-	_mfHeight = markerSize _minefield select 1;
+	_mfWidth = markerSize _mf select 0;
+	_mfHeight = markerSize _mf select 1;
 	// If the minefield marker shape is not symmetric, do it:
 	if ( _mfWidth != _mfHeight ) then {
 		// Make the minefield symmetric:
-		_minefield setMarkerSize [_mfWidth, _mfWidth];
+		_mf setMarkerSize [_mfWidth, _mfWidth];
 		// Alert the mission editor:
-		systemChat format ["%1 Minefield '%2' > it was resized to has its shape symmetric (mandatory).", _txtWarningHeader, _minefield];
+		systemChat format ["%1 Minefield '%2' > it was resized to has its shape symmetric (mandatory).", _txtWarningHeader, _mf];
 	};
 	// If the minefield's radius is smaller than the minimal OR bigger than the maximum, do it:
 	if ( (_mfWidth < _radiusMin) OR (_mfWidth > _radiusMax) ) then {
 		// If smaller, do it:
 		if (_mfWidth < _radiusMin) then { 
 			// set the radius the minal value:
-			_minefield setMarkerSize [_radiusMin, _radiusMin];
+			_mf setMarkerSize [_radiusMin, _radiusMin];
 			// Alarm message:
-			systemChat format ["%1 Minefield '%2' > the script needed to increase the minefield size to the minimum radius.", _txtWarningHeader, _minefield];
+			systemChat format ["%1 Minefield '%2' > the script needed to increase the minefield size to the minimum radius.", _txtWarningHeader, _mf];
 		// Otherwise, if equal or bigger:
 		} else {
 			// the maximum value:
-			_minefield setMarkerSize [_radiusMax, _radiusMax];
+			_mf setMarkerSize [_radiusMax, _radiusMax];
 			// Alarm message:
-			systemChat format ["%1 Minefield '%2' > the script needed to decrease the minefield size to the maximum radius.", _txtWarningHeader, _minefield];
+			systemChat format ["%1 Minefield '%2' > the script needed to decrease the minefield size to the maximum radius.", _txtWarningHeader, _mf];
 		};
 	};
 	// Return:
@@ -339,29 +365,6 @@ THY_fnc_ETHICS_mines_intensity = {
 };
 
 
-/*
-THY_fnc_ETHICS_mine_in_water = {
-	// WIP
-	// Returns _isFloatMine
-
-	params ["_mine"];
-	private ["_floatVal", "_isFloatMine"];
-
-	_floatVal = _mine getVariable ['TAG_canFloat', -1];
-
-	if ( _floatVal isEqualTo -1 ) then 
-	{
-		_floatVal = getNumber (configFile >> 'CfgVehicles' >> (typeOf _mine) >> 'canFloat');
-		_mine setVariable ['TAG_canFloat',_floatVal];
-	};
-
-	_isFloatMine = _floatVal > 0;
-	
-	_isFloatMine  // returning.
-};
-*/
-
-
 THY_fnc_ETHICS_no_mine_topography = {
 	// This function defines all topography features where a mine SHOULD avoid to be planted by the function THY_fnc_ETHICS_inspection. More about topography features on: https://community.bistudio.com/wiki/Location
 	// Returns _noMineZonesTopography: array
@@ -408,37 +411,46 @@ THY_fnc_ETHICS_no_mine_ethics = {
 
 
 THY_fnc_ETHICS_inspection = {
-	// This function ensures that each mine planted respects the previously configured doctrine and intensity rules, deleting the mines that doesn't follow the rules, either by logic or inconsistency.
+	// This function ensures that each mine planted respects the previously configured doctrine and intensity rules, deleting the mines that doesn't follow the rules, nor logic or consistency.
 	// Returns _wasMineDeleted: bool
 
-	params ["_mine", "_minePos", "_noMineZonesTopography", "_noMineZonesEthics"];
+	params ["_mine", "_minePos", "_noMineZonesTopography", "_noMineZonesEthics", "_isNaval"];
 	private ["_wasMineDeleted"];
 	// Initial values:
 	_wasMineDeleted = false;
-	// Check if the mine's position is below of water surface (waves and pond objects included):
-	if ( ((getPosASLW _mine) select 2) < 0.2 ) then // 'select 2' = Z axis.
-	{
-		deleteVehicle _mine;
-		_wasMineDeleted = true;
-		
-	} else {
-		// if Topography rules true, do it:
-		if ( ETHICS_topographyRules ) then {
-			if ( ((_minePos distance (_noMineZonesTopography select 0)) < 100) /*OR ((_minePos distance (_noMineZonesTopography select 1)) < 100)*/ OR ((_minePos distance (_noMineZonesTopography select 2)) < 100) ) then {
-				// Delete the mine:
-				deleteVehicle _mine;
-				// And report it:
-				_wasMineDeleted = true;
+	// If landmine:
+	if ( !_isNaval ) then {
+		// Check if the landmine's position is below of water surface (waves and pond objects included):
+		if ( ((getPosASLW _mine) select 2) < 0.2 ) then {  // 'select 2' = Z axis.
+			deleteVehicle _mine;
+			_wasMineDeleted = true;
+			
+		} else {
+			// if Topography rules true, do it:
+			if ( ETHICS_topographyRules ) then {
+				if ( ((_minePos distance (_noMineZonesTopography select 0)) < 100) /*OR ((_minePos distance (_noMineZonesTopography select 1)) < 100)*/ OR ((_minePos distance (_noMineZonesTopography select 2)) < 100) ) then {
+					// Delete the mine:
+					deleteVehicle _mine;
+					// And report it:
+					_wasMineDeleted = true;
+				};
+			};
+			// if Ethics rules true, do it:
+			if ( ETHICS_ethicsRules ) then {
+				if ( ((_minePos distance (_noMineZonesEthics select 0)) < 200) OR ((_minePos distance (_noMineZonesEthics select 1)) < 200) OR ((_minePos distance (_noMineZonesEthics select 2)) < 200) OR ((_minePos distance (_noMineZonesEthics select 3)) < 100) ) then {
+					// Delete the mine:
+					deleteVehicle _mine;
+					// And report it:
+					_wasMineDeleted = true;
+				};
 			};
 		};
-		// if Ethics rules true, do it:
-		if ( ETHICS_ethicsRules ) then {
-			if ( ((_minePos distance (_noMineZonesEthics select 0)) < 200) OR ((_minePos distance (_noMineZonesEthics select 1)) < 200) OR ((_minePos distance (_noMineZonesEthics select 2)) < 200) OR ((_minePos distance (_noMineZonesEthics select 3)) < 100) ) then {
-				// Delete the mine:
-				deleteVehicle _mine;
-				// And report it:
-				_wasMineDeleted = true;
-			};
+	// If naval mine:
+	} else {
+		// Check if the naval mine's position is a water surface:
+		if ( !(surfaceIsWater _minePos) ) then {
+			deleteVehicle _mine;
+			_wasMineDeleted = true;
 		};
 	};
 	// return:
@@ -450,26 +462,37 @@ THY_fnc_ETHICS_execution_service = {
 	// This function is responsable to plant the each mine.
 	// Returns _wasMineDeleted: bool.
 
-	params ["_minefield", "_faction", "_mineType", "_mfPos", "_mfRadius"];
+	params ["_mfFaction", "_mineType", "_mfPos", "_mfRadius", ["_isNaval", false]];
 	private ["_txtWarningHeader", "_mine", "_minePos", "_noMineZonesTopography", "_noMineZonesEthics", "_wasMineDeleted"];
 	
+	// CPU breath:
+	sleep 0.05;  // CAUTION: without the breath, ETHICS might affect the server performance as hell.
 	// Debug txts:
 	//private _txtDebugHeader = "ETHICS DEBUG >";
 	_txtWarningHeader = "ETHICS WARNING >";
-	// CPU breath:
-	sleep 0.05;  // CAUTION: without the breath, ETHICS might affect the server performance as hell.
+	// Initial values:
+	_noMineZonesTopography = [];
+	_noMineZonesEthics = [];
 	// Mine creation:
 	_mine = createMine [_mineType, _mfPos, [], _mfRadius];  // https://community.bistudio.com/wiki/createMine
-	_minePos = getPos _mine;
-	// Topography rules:
-	_noMineZonesTopography = [_minePos] call THY_fnc_ETHICS_no_mine_topography;
-	// Ethics rules:
-	_noMineZonesEthics = [_minePos] call THY_fnc_ETHICS_no_mine_ethics;
+	// Preparing and checking the land planting:
+	if ( !_isNaval ) then {
+		// Mine position releated by terrain level:
+		_minePos = getPosATL _mine;
+		// Topography rules:
+		_noMineZonesTopography = [_minePos] call THY_fnc_ETHICS_no_mine_topography;
+		// Ethics rules:
+		_noMineZonesEthics = [_minePos] call THY_fnc_ETHICS_no_mine_ethics;
+	// Preparing the naval planting:
+	} else {
+		// Mine position releated by sea level:
+		_minePos = getPosASL _mine;
+	};
 	// Mine inspection to check further rules:
-	_wasMineDeleted = [_mine, _minePos, _noMineZonesTopography, _noMineZonesEthics] call THY_fnc_ETHICS_inspection;
+	_wasMineDeleted = [_mine, _minePos, _noMineZonesTopography, _noMineZonesEthics, _isNaval] call THY_fnc_ETHICS_inspection;
 	// If the mine is okay, do it:
 	if ( !_wasMineDeleted ) then {
-		// if dynamic simulation is ON in the mission, it will save performance:
+		// WIP / if dynamic simulation is ON in the mission, it will save performance:
 		if ( ETHICS_dynamicSimulation ) then { 
 			_mine enableDynamicSimulation true;  // https://community.bistudio.com/wiki/enableDynamicSimulation
 			if ( isDedicated ) then {
@@ -479,7 +502,7 @@ THY_fnc_ETHICS_execution_service = {
 			};
 		};
 		// Case by case about the mine owners, do it:
-		switch ( _faction ) do {
+		switch ( _mfFaction ) do {
 			case "BLU": { blufor revealMine _mine };
 			case "OPF": { opfor revealMine _mine };
 			case "IND": { independent revealMine _mine };
@@ -499,25 +522,20 @@ THY_fnc_ETHICS_mine_planter = {
 	// This function organizes how each doctrine plants its mines.
 	// Returns _mineAmountsByType: array [AP [planted, deleted], AM [planted, deleted]]
 
-	params ["_mfNameStructure", "_typeAP", "_typeAM", "_minefield", "_mfSize", "_limiterMineAmounts", "_mineAmountsByType"];
-	private ["_txtWarningHeader", "_doctrine", "_faction", "_mfPos", "_mfRadius", "_limiterAmountAP", "_limiterAmountAM", "_limiterMultiplier", "_allMinesPlantedAP", "_allMinesDeletedAP", "_allMinesPlantedAM", "_allMinesDeletedAM", "_minesPlantedAP", "_minesDeletedAP", "_minesPlantedAM", "_minesDeletedAM", "_wasMineDeleted", "_limiterMinesDeleted"];
+	params ["_mfNameStructure", "_landTypeAP", "_landTypeAM", "_navalTypeAM", "_mf", "_mfSize", "_limiterMineAmounts", "_mineAmountsByType"];
+	private ["_mfDoctrine", "_mfFaction", "_mfPos", "_mfRadius", "_limiterAmountAP", "_limiterAmountAM", "_limiterMultiplier", "_allMinesPlantedAP", "_allMinesDeletedAP", "_allMinesPlantedAM", "_allMinesDeletedAM", "_minesPlantedAP", "_minesDeletedAP", "_minesPlantedAM", "_minesDeletedAM", "_wasMineDeleted"];
 
 	// Debug txts:
 	//private _txtDebugHeader = "ETHICS DEBUG >";
-	_txtWarningHeader = "ETHICS WARNING >";
+	//private _txtWarningHeader = "ETHICS WARNING >";
 	// Config from Minefield Name Structure:
-	_doctrine = toUpper (_mfNameStructure select 1);
-	_faction = "";
-	if ( (count _mfNameStructure) == 4 ) then { _faction = toUpper (_mfNameStructure select 2) };
-	// Handling errors:
-	if ( !(_doctrine in ["AP", "AM", "HY"]) ) then {
-		systemChat format ["%1 Minefield '%2' > The doctrine tag looks wrong. There's no any '%3' doctrine. To avoid this error, for this specific minefield it was changed to AP.", _txtWarningHeader, _minefield, _doctrine];
-		_doctrine = "AP";
-	};
+	_mfDoctrine = toUpper (_mfNameStructure select 1);
+	_mfFaction = "";
+	if ( (count _mfNameStructure) == 4 ) then { _mfFaction = toUpper (_mfNameStructure select 2) };
 	// Minefield attributes: 
-	_mfPos = markerPos _minefield;            // [5800.70,3000.60,0]
+	_mfPos = markerPos _mf;            // [5800.70,3000.60,0]
 	_mfRadius = _mfSize select 0;      // 40.1234
-	// Limiters for this _minefield, previously based on its size:
+	// Limiters for this _mf, previously based on its size:
 	_limiterAmountAP = _limiterMineAmounts select 0;
 	_limiterAmountAM = _limiterMineAmounts select 1;
 	_limiterMultiplier = 0.6;  // 60% is the minimal amount to be planted.
@@ -528,42 +546,42 @@ THY_fnc_ETHICS_mine_planter = {
 	_allMinesDeletedAP = (_mineAmountsByType select 0) select 1;
 	_allMinesPlantedAM = (_mineAmountsByType select 1) select 0;
 	_allMinesDeletedAM = (_mineAmountsByType select 1) select 1;
-	// Mines' numbers only for this _minefield:
+	// Mines' numbers only for this _mf:
 	_minesPlantedAP = _limiterAmountAP;
 	_minesDeletedAP = 0;
 	_minesPlantedAM = _limiterAmountAM;
 	_minesDeletedAM = 0;
 	// Mine planter rules by doctrine:
-	switch ( _doctrine ) do {
-		// ANTI-PERSONNEL, planting all of them at once:
+	switch ( _mfDoctrine ) do {
+		// LAND ANTI-PERSONNEL, planting all of them at once:
 		case "AP": {
 			// AP amount planting in a row:
 			for "_i" from 1 to _limiterAmountAP do {
 				// Execute the mine planting:
-				_wasMineDeleted = [_minefield, _faction, _typeAP, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
+				_wasMineDeleted = [_mfFaction, _landTypeAP, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
 				// If something went wrong, deleted amount of mines:
 				if ( _wasMineDeleted ) then { _minesDeletedAP = _minesDeletedAP + 1 };
 			};
 			// Debug Minefield feedbacks:
-			[_doctrine, _minefield, _minesPlantedAP, _minesDeletedAP, _limiterMinesDeletedAP, ETHICS_debug] call THY_fnc_ETHICS_done_feedbacks;
+			[_mfDoctrine, _mf, _minesPlantedAP, _minesDeletedAP, _limiterMinesDeletedAP, ETHICS_debug] call THY_fnc_ETHICS_done_feedbacks;
 			// Update with total numbers to return:
 			_mineAmountsByType = [[(_allMinesPlantedAP + _minesPlantedAP), (_allMinesDeletedAP + _minesDeletedAP)], [_allMinesPlantedAM, _allMinesDeletedAM]];
 		};
-		// ANTI-MAERIAL, planting all of them at once:
+		// LAND ANTI-MAERIAL, planting all of them at once:
 		case "AM": {
 			// AM amount planting in a row:
 			for "_i" from 1 to _limiterAmountAM do {
 				// Execute the mine planting:
-				_wasMineDeleted = [_minefield, _faction, _typeAM, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
+				_wasMineDeleted = [_mfFaction, _landTypeAM, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
 				// If something went wrong, deleted amount of mines:
 				if ( _wasMineDeleted ) then { _minesDeletedAM = _minesDeletedAM + 1 };
 			};
 			// Debug Minefield feedbacks:
-			[_doctrine, _minefield, _minesPlantedAM, _minesDeletedAM, _limiterMinesDeletedAM, ETHICS_debug] call THY_fnc_ETHICS_done_feedbacks;
+			[_mfDoctrine, _mf, _minesPlantedAM, _minesDeletedAM, _limiterMinesDeletedAM, ETHICS_debug] call THY_fnc_ETHICS_done_feedbacks;
 			// Update with total numbers to return:
 			_mineAmountsByType = [[_allMinesPlantedAP, _allMinesDeletedAP], [(_allMinesPlantedAM + _minesPlantedAM), (_allMinesDeletedAM + _minesDeletedAM)]]; 
 		};
-		// HYBRID, planting all combined mines at once:
+		// LAND HYBRID, planting all combined mines at once:
 		case "HY": {
 			// Reducing a each mine type for the combination amount doesn't except too much the limits:
 			_limiterAmountAP = round (_limiterAmountAP / 1.3);  // Makes AP proporsion bigger than AM.
@@ -577,22 +595,36 @@ THY_fnc_ETHICS_mine_planter = {
 			// AP amount planting in a row:
 			for "_i" from 1 to _limiterAmountAP do {
 				// Execute the mine planting:
-				_wasMineDeleted = [_minefield, _faction, _typeAP, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
+				_wasMineDeleted = [_mfFaction, _landTypeAP, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
 				// If something went wrong, deleted amount of mines:
 				if ( _wasMineDeleted ) then { _minesDeletedAP = _minesDeletedAP + 1 };
 			};
 			// AM amount planting in a row:
 			for "_i" from 1 to _limiterAmountAM do {
 				// Execute the mine planting:
-				_wasMineDeleted = [_minefield, _faction, _typeAM, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
+				_wasMineDeleted = [_mfFaction, _landTypeAM, _mfPos, _mfRadius] call THY_fnc_ETHICS_execution_service;
 				// If something went wrong, deleted amount of mines:
 				if ( _wasMineDeleted ) then { _minesDeletedAM = _minesDeletedAM + 1 };
 			};
 			// Debug Minefield feedbacks:
-			[_doctrine, _minefield, _minesPlantedAP, _minesDeletedAP, _limiterMinesDeletedAP, ETHICS_debug, "Hybrid", "AP"] call THY_fnc_ETHICS_done_feedbacks;
-			[_doctrine, _minefield, _minesPlantedAM, _minesDeletedAM, _limiterMinesDeletedAM, ETHICS_debug, "Hybrid", "AM"] call THY_fnc_ETHICS_done_feedbacks;
+			[_mfDoctrine, _mf, _minesPlantedAP, _minesDeletedAP, _limiterMinesDeletedAP, ETHICS_debug, "Hybrid", "AP"] call THY_fnc_ETHICS_done_feedbacks;
+			[_mfDoctrine, _mf, _minesPlantedAM, _minesDeletedAM, _limiterMinesDeletedAM, ETHICS_debug, "Hybrid", "AM"] call THY_fnc_ETHICS_done_feedbacks;
 			// Update with total numbers to return:
 			_mineAmountsByType = [[(_allMinesPlantedAP + _minesPlantedAP), (_allMinesDeletedAP + _minesDeletedAP)], [(_allMinesPlantedAM + _minesPlantedAM), (_allMinesDeletedAM + _minesDeletedAM)]];
+		};
+		// NAVAL ANTI-MAERIAL, planting all of them at once:
+		case "NAM": {
+			// AM amount planting in a row:
+			for "_i" from 1 to _limiterAmountAM do {
+				// Execute the mine planting:
+				_wasMineDeleted = [_mfFaction, _navalTypeAM, _mfPos, _mfRadius, true] call THY_fnc_ETHICS_execution_service;
+				// If something went wrong, deleted amount of mines:
+				if ( _wasMineDeleted ) then { _minesDeletedAM = _minesDeletedAM + 1 };
+			};
+			// Debug Minefield feedbacks:
+			[_mfDoctrine, _mf, _minesPlantedAM, _minesDeletedAM, _limiterMinesDeletedAM, ETHICS_debug] call THY_fnc_ETHICS_done_feedbacks;
+			// Update with total numbers to return:
+			_mineAmountsByType = [[_allMinesPlantedAP, _allMinesDeletedAP], [(_allMinesPlantedAM + _minesPlantedAM), (_allMinesDeletedAM + _minesDeletedAM)]]; 
 		};
 	};
 	// Return:
@@ -604,7 +636,7 @@ THY_fnc_ETHICS_done_feedbacks = {
 	// This function just gives some feedback about minefields numbers, sometimes for debugging purposes, sometimes for warning the mission editor. 
 	// Returns nothing.
 
-	params ["_doctrine", "_minefield", "_minesPlanted", "_minesDeleted", "_limiterMinesDeleted", "_debug", ["_combinedTitle", ""], ["_combinedTypes", ""]];
+	params ["_mfDoctrine", "_mf", "_minesPlanted", "_minesDeleted", "_limiterMinesDeleted", "_debug", ["_combinedTitle", ""], ["_combinedTypes", ""]];
 	private ["_txtDebugHeader", "_txtWarningHeader", "_txtWarning_2"];
 
 	// Debug txts:
@@ -617,16 +649,16 @@ THY_fnc_ETHICS_done_feedbacks = {
 		if ( _debug AND (_minesDeleted < _limiterMinesDeleted) ) then { 
 			// If no mines deleted:
 			if ( _minesDeleted == 0 ) then {
-				systemChat format ["%1 Minefield '%2' > Got all %3 %4 mines planted successfully.", _txtDebugHeader, _minefield, _minesPlanted, _doctrine];
+				systemChat format ["%1 Minefield '%2' > Got all %3 %4 mines planted successfully.", _txtDebugHeader, _mf, _minesPlanted, _mfDoctrine];
 			// Otherwise, just a few mines deleted:
 			} else {
-				systemChat format ["%1 Minefield '%2' > From %3 %4 mines planted, %5 were deleted (balance: %6).", _txtDebugHeader, _minefield, _minesPlanted, _doctrine, _minesDeleted, (_minesPlanted - _minesDeleted)];
+				systemChat format ["%1 Minefield '%2' > From %3 %4 mines planted, %5 were deleted (balance: %6).", _txtDebugHeader, _mf, _minesPlanted, _mfDoctrine, _minesDeleted, (_minesPlanted - _minesDeleted)];
 			};
 		// Debug Minefield feedbacks > Probably some mission editor's action is required:
 		} else {
 			// Lot of mines were deleted:
 			if ( _minesDeleted > _limiterMinesDeleted ) then {
-				systemChat format ["%1 Minefield '%2' > Too much %3 mines deleted (%4 of %5) for simulation reasons or editor's choices. %6", _txtWarningHeader, _minefield, _doctrine, _minesDeleted, _minesPlanted, _txtWarning_2];
+				systemChat format ["%1 Minefield '%2' > Too much %3 mines deleted (%4 of %5) for simulation reasons or editor's choices. %6", _txtWarningHeader, _mf, _mfDoctrine, _minesDeleted, _minesPlanted, _txtWarning_2];
 			};
 		};
 	// Otherwise, if the doctrine has mine types combined, do it:
@@ -635,16 +667,16 @@ THY_fnc_ETHICS_done_feedbacks = {
 		if ( _debug AND (_minesDeleted < _limiterMinesDeleted) ) then { 
 			// If no mines deleted:
 			if ( _minesDeleted == 0 ) then {
-				systemChat format ["%1 Minefield '%2' > %3 > Got all %4 %5 mines planted successfully.", _txtDebugHeader, _minefield, _combinedTitle, _minesPlanted, _combinedTypes];
+				systemChat format ["%1 Minefield '%2' > %3 > Got all %4 %5 mines planted successfully.", _txtDebugHeader, _mf, _combinedTitle, _minesPlanted, _combinedTypes];
 			// Otherwise, just a few mines deleted:
 			} else {
-				systemChat format ["%1 Minefield '%2' > %3 > %4 > From %5 mines planted, %6 were deleted (balance: %7).", _txtDebugHeader, _minefield, _combinedTitle, _combinedTypes, _minesPlanted, _minesDeleted, (_minesPlanted - _minesDeleted)];
+				systemChat format ["%1 Minefield '%2' > %3 > %4 > From %5 mines planted, %6 were deleted (balance: %7).", _txtDebugHeader, _mf, _combinedTitle, _combinedTypes, _minesPlanted, _minesDeleted, (_minesPlanted - _minesDeleted)];
 			};
 		// Debug Minefield feedbacks > Probably some mission editor's action is required:
 		} else {
 			// Lot of mines were deleted:
 			if ( _minesDeleted > _limiterMinesDeleted ) then {
-				systemChat format ["%1 Minefield '%2' > %3 > Too much %4 mines deleted (%5 of %6) for simulation reasons or editor's choices. %7", _txtWarningHeader, _minefield, _combinedTitle, _combinedTypes, _minesDeleted, _minesPlanted, _txtWarning_2];
+				systemChat format ["%1 Minefield '%2' > %3 > Too much %4 mines deleted (%5 of %6) for simulation reasons or editor's choices. %7", _txtWarningHeader, _mf, _combinedTitle, _combinedTypes, _minesDeleted, _minesPlanted, _txtWarning_2];
 			};
 		};
 	};
