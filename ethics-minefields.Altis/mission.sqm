@@ -8,7 +8,7 @@ class EditorData
 	toggles=1537;
 	class ItemIDProvider
 	{
-		nextID=25;
+		nextID=26;
 	};
 	class MarkerIDProvider
 	{
@@ -16,14 +16,14 @@ class EditorData
 	};
 	class LayerIndexProvider
 	{
-		nextID=2;
+		nextID=5;
 	};
 	class Camera
 	{
 		pos[]={13675.256,39.27203,20042.029};
-		dir[]={-0.18136102,-0.25084656,-0.95089471};
-		up[]={-0.04699694,0.96802491,-0.24641235};
-		aside[]={-0.98229903,-5.62286e-008,0.18735041};
+		dir[]={-0.33575153,-0.28799698,-0.89684373};
+		up[]={-0.10097355,0.95763135,-0.26971579};
+		aside[]={-0.93652296,-7.4505806e-009,0.35060626};
 	};
 };
 binarizationWanted=0;
@@ -210,7 +210,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={13365.615,17.72364,16950.371};
-								angles[]={0,0.32280254,-0};
+								angles[]={0,0.32280254,0};
 							};
 							side="East";
 							flags=5;
@@ -226,7 +226,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={13370.012,17.708071,16949.205};
-								angles[]={0,0.31938463,-0};
+								angles[]={0,0.31938463,0};
 							};
 							side="East";
 							flags=5;
@@ -259,7 +259,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={13669.047,27.944376,20012.484};
-								angles[]={0,3.3934565,-0};
+								angles[]={0,3.3934565,0};
 							};
 							side="West";
 							flags=7;
@@ -277,7 +277,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={13673.466,28.118137,20015.986};
-								angles[]={0,3.5080881,-0};
+								angles[]={0,3.5080881,0};
 							};
 							side="West";
 							flags=5;
@@ -294,7 +294,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={13669.038,28.066431,20016.77};
-								angles[]={0,3.5528512,-0};
+								angles[]={0,3.5528512,0};
 							};
 							side="West";
 							flags=5;
@@ -375,7 +375,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={16533.512,34.184177,18966.24};
-								angles[]={0,4.0703435,-0};
+								angles[]={0,4.0703435,0};
 							};
 							side="Independent";
 							flags=5;
@@ -392,7 +392,7 @@ class Mission
 							class PositionInfo
 							{
 								position[]={16530.506,34.162014,18969.941};
-								angles[]={0,4.1880274,-0};
+								angles[]={0,4.1880274,0};
 							};
 							side="Independent";
 							flags=5;
@@ -497,6 +497,7 @@ class Mission
 					};
 					id=7;
 					type="B_MRAP_01_F";
+					atlOffset=7.6293945e-006;
 					class CustomAttributes
 					{
 						class Attribute0
@@ -522,18 +523,6 @@ class Mission
 		class Item1
 		{
 			dataType="Marker";
-			position[]={13220.549,19.116455,22632.211};
-			name="mf_ap_1";
-			markerType="ELLIPSE";
-			type="";
-			a=1543.34;
-			b=1543.34;
-			id=2;
-			atlOffset=-42.701225;
-		};
-		class Item2
-		{
-			dataType="Marker";
 			position[]={14652.168,7.4660001,18349.734};
 			name="mf_hy_blu_1";
 			markerType="ELLIPSE";
@@ -543,41 +532,41 @@ class Mission
 			id=3;
 			atlOffset=-16.345118;
 		};
+		class Item2
+		{
+			dataType="Marker";
+			position[]={12088.553,0,22949.184};
+			name="mf_ap_1";
+			markerType="ELLIPSE";
+			type="";
+			a=919.4342;
+			b=919.4342;
+			id=4;
+			atlOffset=2.3372927;
+		};
 		class Item3
 		{
 			dataType="Marker";
-			position[]={6310.3271,177.69,20966.617};
-			name="mf_ap_opf_1";
-			markerType="ELLIPSE";
-			type="";
-			a=1365.108;
-			b=1365.108;
-			id=4;
-			atlOffset=11.550522;
-		};
-		class Item4
-		{
-			dataType="Marker";
-			position[]={10449.307,245.58501,18992.512};
-			name="mf_am_2";
+			position[]={10347.532,256.784,19060.361};
+			name="mf_hy_opf_1";
 			markerType="ELLIPSE";
 			type="";
 			a=1125.896;
 			b=1125.896;
 			id=5;
-			atlOffset=130.97485;
+			atlOffset=130.97528;
 		};
-		class Item5
+		class Item4
 		{
 			dataType="Marker";
 			position[]={4598.084,0,23723.807};
 			name="marker-script-version";
-			text="    VERSION JAN, 31st 2023    (B)";
+			text="    VERSION JAN, 31st 2023    (C)";
 			type="mil_box";
 			id=23;
 			atlOffset=165.30959;
 		};
-		class Item6
+		class Item5
 		{
 			dataType="Logic";
 			class PositionInfo
@@ -643,6 +632,18 @@ class Mission
 				};
 				nAttributes=4;
 			};
+		};
+		class Item6
+		{
+			dataType="Marker";
+			position[]={14889.977,6.5339999,22785.641};
+			name="mf_nam_ind_1";
+			markerType="ELLIPSE";
+			type="";
+			a=1145.657;
+			b=1145.657;
+			id=25;
+			atlOffset=0.00035524368;
 		};
 	};
 };
