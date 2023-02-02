@@ -1,7 +1,7 @@
 # Arma 3 / ETHICS Minefields v1.3
 >*Dependencies: none.*
 
-ETHICS is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions.
+ETHICS  is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions. ETHICS include doctrines of land anti-personnel, land anti-materiel, unexploded ordnance, and naval anti-materiel minefields.
 
 ## HOW TO INSTALL / DOCUMENTATION
 
