@@ -40,8 +40,8 @@ __
 
 **Feb, XXth 2023 | v1.5**
 
-- Added > New kill zone doctrine: UXO, Unexploded Ordnance zone, absolutly through unique features;
-- Added > New kill zone doctrine: BT,  Booby-trap, also a great option totally different logic;
+- Added > New killzone doctrine: UXO, Unexploded Ordnance zone, absolutly through unique features;
+- Added > New killzone doctrine: BT,  Booby-trap, also a great option totally different logic;
 - Improvements > The new doctrines requested lot of hours of reviewing code; 
 - Fixed > fixed a markerColor inconcistence when debug mode activated, and an invalid faction tag was applied;
 
