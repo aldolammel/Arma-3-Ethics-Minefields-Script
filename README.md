@@ -1,7 +1,7 @@
-# Arma 3 / ETHICS Minefields v1.3
+# Arma 3 / ETHICS Minefields v1.5 (WIP)
 >*Dependencies: none.*
 
-ETHICS  is a full solution script for ARMA 3 that provides wide management over minefield creation for single-player and multiplayer missions. ETHICS include doctrines of land anti-personnel, land anti-materiel, unexploded ordnance, and naval anti-materiel minefields.
+ETHICS  is a full solution script for ARMA 3 that provides wide creation and management over statics kill zones like minefields, UXO zones, and trap zones. Built for single-player and multiplayer, ETHICS include kill zone doctrines such as land anti-personnel, land anti-materiel, naval anti-materiel, unexploded ordnance, and booby-trap.
 
 ## HOW TO INSTALL / DOCUMENTATION
 
@@ -13,18 +13,20 @@ __
 
 ## SCRIPT DETAILS
 
-- Drag and drop a marker on Eden to create a full and unique minefield;
-- Ethics control (ON/OFF) to avoid planting mines through civilian zones;
-- Topography control (ON/OFF) to avoid rock clusters and mountains;
-- Also it works with naval mines for naval minefield;
+- Drag and drop a marker on Eden to create a full and unique static kill zone such as minefields;
+- Easy to build naval minefields, Unexploded ordnance zones (UXO), and Trap zones;
+- Ethics control (ON/OFF) to avoid planting explosive devices through civilian zones;
+- Topography control (ON/OFF) to avoid to planting over rock clusters and mountains;
+- UXO doesn't respect Ethics or topography controls;
 - Landmines won't be planted in water / Navalmines never out of water;
-- Set (or not) for each minefield which faction is its owner;
-- Set for each minefield a doctrine: Anti-personnel, Anti-materiel, or hybrid;
-- Set for the minefield’s mines amount intensity: low, mid, high, or extreme;
-- Option for AM doctrine plants its mines only on roads;
-- Friendly error handling;
-- Full debug monitor for mission editors;
-- Full documentation available.
+- Set (or not) for each kill zone has a faction owner;
+- Set for each kill zone a doctrine: Anti-personnel, Anti-materiel, Hybrid, UXO or Booby-trap;
+- Easy explosive devices amount's management through the global intensity presets: low, mid, high, or extreme;
+- Set (or not) for AM doctrine plants its mines only on roads and streets;
+- All AP mines always will avoid roads and streets;
+- Debugging: friendly error handling;
+- Debugging: a hint monitor, and systemChat feedbacks for the mission editor;
+- Debugging: full documentation available.
 
 __
 
@@ -35,6 +37,13 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/241257-rele
 __
 
 ## CHANGELONG
+
+**Feb, XXth 2023 | v1.5**
+
+- Added > New kill zone doctrine: UXO, Unexploded Ordnance zone, absolutly through unique features;
+- Added > New kill zone doctrine: BT,  Booby-trap, also a great option totally different logic;
+- Improvements > The new doctrines requested lot of hours of reviewing code; 
+- Fixed > fixed a markerColor inconcistence when debug mode activated, and an invalid faction tag was applied;
 
 **Feb, 1st 2023 | v1.3**
 
