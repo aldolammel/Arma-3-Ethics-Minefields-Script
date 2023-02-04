@@ -14,16 +14,16 @@ __
 ## SCRIPT DETAILS
 
 - Drag and drop a marker on Eden to create a full and unique static kill zone such as minefields;
-- Easy to build naval minefields, Unexploded ordnance zones (UXO), and Trap zones;
+- Also easy to build naval minefields, Unexploded ordnance zones (UXO), and Trap zones;
 - Ethics control (ON/OFF) to avoid planting explosive devices through civilian zones;
-- Topography control (ON/OFF) to avoid to planting over rock clusters and mountains;
-- UXO doesn't respect Ethics or topography controls;
-- Landmines won't be planted in water / Navalmines never out of water;
+- Topography control (ON/OFF) to avoid planting over rock clusters and mountains;
+- UXO doesn't respect Ethics or topography controls, and can be dropped under the water;
+- Boobs-trap doesn't respect topography controls and they are always hidden, never in the open;
+- Anti-personnel (AP) landmines avoid roads and streets;
+- Anti-materiel (AM) landmines are planted (ON/OFF) only on roads and streets;
+- Classic minefields can be also hybrid, bringing AP + AM mines;
 - Set (or not) for each kill zone has a faction owner;
-- Set for each kill zone a doctrine: Anti-personnel, Anti-materiel, Hybrid, UXO or Booby-trap;
-- Easy explosive devices amount's management through the global intensity presets: low, mid, high, or extreme;
-- Set (or not) for AM doctrine plants its mines only on roads and streets;
-- All AP mines always will avoid roads and streets;
+- Easy explosive devices amount management through the global intensity presets: low, mid, high, or extreme;
 - Debugging: friendly error handling;
 - Debugging: a hint monitor, and systemChat feedbacks for the mission editor;
 - Debugging: full documentation available.
@@ -38,7 +38,7 @@ __
 
 ## CHANGELONG
 
-**Feb, XXth 2023 | v1.5**
+**Feb, 4th 2023 | v1.5**
 
 - Added > New killzone doctrine: UXO, Unexploded Ordnance zone, absolutly through unique features;
 - Added > New killzone doctrine: BT,  Booby-trap, also a great option totally different logic;
