@@ -1,4 +1,4 @@
-# Arma 3 / ETHICS Minefields v1.5 (WIP)
+# Arma 3 / ETHICS Minefields v1.5
 >*Dependencies: none.*
 
 ETHICS  is a full solution script for ARMA 3 that provides wide creation and management over statics kill zones like minefields, UXO zones, and trap zones. Built for single-player and multiplayer, ETHICS include kill zone doctrines such as land anti-personnel, land anti-materiel, naval anti-materiel, unexploded ordnance, and booby-trap.
