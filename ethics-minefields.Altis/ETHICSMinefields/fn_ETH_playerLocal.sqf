@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.3
+// ETHICS MINEFIELDS v1.5
 // File: your_mission\ETHICSMinefields\fn_ETH_playerLocal.sqf
 // by thy (@aldolammel)
 
@@ -11,8 +11,8 @@ if (!hasInterface) exitWith {};  // all players clients and player host can read
 
 [] spawn {
 	// Check if the main script file is okay to keep going:
-	if ( ETH_landMinesDoctrines OR ETH_navalMinesDoctrines ) then {
+	if ( ETH_doctrinesLandMinefield OR ETH_doctrinesNavalMinefield OR ETH_doctrinesOXU OR ETH_doctrinesTraps ) then {
 		// Let's see if this player should see some minefield:
-		[ETH_confirmedMfMarkers, ETH_prefix, ETH_spacer, ETH_visibleOnMap, ETH_styleColor, ETH_styleBrush, ETH_styleAlpha] call THY_fnc_ETH_markers_visibility;
+		[ETH_confirmedKzMarkers, ETH_prefix, ETH_spacer, ETH_killzoneVisibleOnMap, ETH_killzoneStyleColor, ETH_killzoneStyleBrush, ETH_killzoneStyleAlpha] call THY_fnc_ETH_markers_visibility;
 	};
 };
