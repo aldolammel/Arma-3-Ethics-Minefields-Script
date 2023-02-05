@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5.3
+// ETHICS MINEFIELDS v1.5.3.1
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -937,7 +937,7 @@ THY_fnc_ETH_done_feedbacks = {
 	_txtWarningHeader = "ETHICS WARNING >";
 	_txtWarning_2 = "Try to change the kill zone position. Not recommended, you might also turn off the ETHICS and TOPOGRAPHY rules.";
 	_txtWarning_4 = format ["Too much devices deleted (%1 of %2) for simulation reasons or editor's choices. %3", _devicesDeleted, _devicesPlanted, _txtWarning_2];
-	_txtWarning_5 = format ["No mines were planted. Try to restart the mission to make sure it was just a coincidence. If the behavior comes again, try to change the kill zone position or increase the mines' intensity (current='%1'). As a last resort, turn ETH_onlyOnRoadsAM off.", ETH_globalDevicesIntensity];
+	_txtWarning_5 = format ["No mines were planted. Try to restart the mission to make sure it was just a coincidence. If the behavior comes again, try to change the kill zone position or increase the mines' intensity (current='%1').", ETH_globalDevicesIntensity];
 	// If doctrine has NO subdoctrine:
 	if ( _hybridTitle == "" ) then {
 		// Debug Kill zone feedbacks > Everything looks fine:
@@ -989,8 +989,8 @@ THY_fnc_ETH_done_feedbacks = {
 			// Otherwise, if it's LAN:
 			} else {
 				// just show the regular debug message for HY LAM if, at least, one LAM was planted:
-				if ( ETH_debug AND ((_devicesPlanted - _devicesDeleted) != 0) ) then { 
-					systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
+				if (  (_devicesPlanted - _devicesDeleted) != 0 ) then {
+					if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)] };
 				// Otherwise, you finally got a rare scenario to check:
 				} else {
 					systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_5];
