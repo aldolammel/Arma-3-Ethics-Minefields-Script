@@ -1,4 +1,4 @@
-# Arma 3 / ETHICS Minefields v1.5
+# Arma 3 / ETHICS Minefields v1.5.3
 >*Dependencies: none.*
 
 ETHICS  is a full solution script for ARMA 3 that provides wide creation and management over statics kill zones like minefields, UXO zones, and trap zones. Built for single-player and multiplayer, ETHICS include kill zone doctrines such as land anti-personnel, land anti-materiel, naval anti-materiel, unexploded ordnance, and booby-trap.
@@ -23,7 +23,7 @@ __
 - Anti-materiel (AM) landmines are planted (ON/OFF) only on roads and streets;
 - Classic minefields can be also hybrid, bringing AP + AM mines;
 - Set (or not) for each kill zone has a faction owner;
-- Easy explosive devices amount management through the global intensity presets: low, mid, high, or extreme;
+- Easy explosive devices amount management through the global intensity presets: lowest, low, mid, high, or extreme;
 - Debugging: friendly error handling;
 - Debugging: a hint monitor, and systemChat feedbacks for the mission editor;
 - Debugging: full documentation available.
@@ -37,6 +37,12 @@ Discussion and known issues: https://forums.bohemia.net/forums/topic/241257-rele
 __
 
 ## CHANGELONG
+
+**Feb, 5th 2023 | v1.5.3**
+
+- Added > Explosive device preset's intensity: "lowest";
+- Improvement > Limited Anti-Material is a specific doctrine called "LAM";
+- Documentation has been updated.
 
 **Feb, 4th 2023 | v1.5**
 
