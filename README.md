@@ -13,17 +13,18 @@ __
 
 ## SCRIPT DETAILS
 
-- Drag and drop a marker on Eden to create a full and unique static kill zone such as minefields;
+- Drag and drop a marker on Eden to create a full and unique kill zone such as minefields;
 - Also easy to build naval minefields, Unexploded ordnance zones (UXO), and Trap zones;
-- Ethics control (ON/OFF) to avoid planting explosive devices through civilian zones;
+- Ethics control (ON/OFF) to avoid planting explosive devices through civilian areas;
 - Topography control (ON/OFF) to avoid planting over rock clusters and mountains;
-- UXO doesn't respect Ethics or topography controls, and can be dropped under the water;
-- Boobs-trap doesn't respect topography controls and they are always hidden, never in the open;
+- UXO doesn't respect Ethics or topography rules, and can be dropped under the water;
+- Boobs-trap doesn't respect topography rules and they are always hidden, never in the open;
 - Anti-personnel (AP) landmines avoid roads and streets;
-- Anti-materiel (AM) landmines are planted (ON/OFF) only on roads and streets;
-- Classic minefields can be also hybrid, bringing AP + AM mines;
+- Anti-materiel (AM) landmines can be planted (ON/OFF) only on roads and streets;
+- Classic minefields can be also hybrid, bringing AP and AM mines features;
 - Set (or not) for each kill zone has a faction owner;
 - Easy explosive devices amount management through the global intensity presets: lowest, low, mid, high, or extreme;
+- Easy way to hide all markers on map (ON/OFF), even to kill zone owners;
 - Debugging: friendly error handling;
 - Debugging: a hint monitor, and systemChat feedbacks for the mission editor;
 - Debugging: full documentation available.
