@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5
+// ETHICS MINEFIELDS v1.5.2
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -141,24 +141,21 @@ THY_fnc_ETH_available_doctrines = {
 	// This function just checks and returns which doctrines are available for the mission.
 	// Returns _allDoctrinesAvailable: array ["each string is a tag of available doctrine"]
 
-	params ["_isOnDoctrinesLandMinefields", "_isOnDoctrinesNavalMinefields", "_isOnDoctrinesUXO", "_isOnDoctrinesTraps"];
-	private ["_doctrinesLandMinefields", "_doctrinesNavalMinefields", "_doctrinesUXO", "_doctrinesTraps", "_allDoctrinesAvailable"];
+	params ["_isOnDoctLandMinefields", "_isOnDoctNavalMinefields", "_isOnDoctUXO", "_isOnDoctTraps"];
+	private ["_doctLandMinefields", "_doctNavalMinefields", "_doctUXO", "_doctTraps", "_allDoctAvailable"];
 
-	// Debug txts:
-	//private _txtDebugHeader = "ETHICS DEBUG >";
-	//private _txtWarningHeader = "ETHICS WARNING >";
 	// Initial values:
-	_doctrinesLandMinefields = [];
-	_doctrinesNavalMinefields = [];
-	_doctrinesUXO = [];
-	_doctrinesTraps = [];
+	_doctLandMinefields = [];
+	_doctNavalMinefields = [];
+	_doctUXO = [];
+	_doctTraps = [];
 	// Checking the available doctrines:
-	if ( _isOnDoctrinesLandMinefields ) then { _doctrinesLandMinefields = ["AP", "AM", "HY"] };
-	if ( _isOnDoctrinesNavalMinefields ) then { _doctrinesNavalMinefields = ["NAM"] };
-	if ( _isOnDoctrinesUXO ) then { _doctrinesUXO = ["UXO"] };
-	if ( _isOnDoctrinesTraps ) then { _doctrinesTraps = ["BT"] };
+	if ( _isOnDoctLandMinefields ) then { _doctLandMinefields = ["AP", "AM", "LAM", "HY", "LHY"] };
+	if ( _isOnDoctNavalMinefields ) then { _doctNavalMinefields = ["NAM"] };
+	if ( _isOnDoctUXO ) then { _doctUXO = ["UXO"] };
+	if ( _isOnDoctTraps ) then { _doctTraps = ["BT"] };
 	// Merging all available doctrines to return:
-	_allDoctrinesAvailable = _doctrinesLandMinefields + _doctrinesNavalMinefields + _doctrinesUXO + _doctrinesTraps;
+	_allDoctrinesAvailable = _doctLandMinefields + _doctNavalMinefields + _doctUXO + _doctTraps;
 	// Error handling:
 	// It's in fn_ETH_management.sqf to stop the script as soon as possible if no doctrines are activated;
 	// Return:
@@ -286,7 +283,7 @@ THY_fnc_ETH_style = {
 		};
 	};
 	// Finally, execute the style configuration:
-	if ( ETH_doctrinesLandMinefield AND ETH_onlyOnRoadsAM AND (_kzDoctrine == "AM") ) then { _brush = "Border" };  // style for doctrines where only roads are mined.
+	if ( ETH_doctrinesLandMinefield AND (_kzDoctrine == "LAM") ) then { _brush = "Border" };  // style for doctrines where only roads are mined.
 	if ( ETH_doctrinesTraps AND (_kzDoctrine == "BT") ) then { _brush = "Border" };  // style for doctrines where only roads are mined.
 	if ( ETH_doctrinesOXU AND (_kzDoctrine == "UXO") ) then { _brush = "Cross" };
 	_kz setMarkerColorLocal _color;  // https://community.bistudio.com/wiki/Arma_3:_CfgMarkerColors
@@ -390,7 +387,7 @@ THY_fnc_ETH_devices_intensity = {
 	_txtWarningHeader = "ETHICS WARNING >";
 	// Handling errors:
 	_intensity = toUpper _intensity;
-	if ( !(_intensity in ["EXTREME", "HIGH", "MID", "LOW"]) ) then {
+	if ( !(_intensity in ["EXTREME", "HIGH", "MID", "LOW", "LOWEST"]) ) then {
 		systemChat format ["%1 fn_ETH_management.sqf > check the INTENSITY configuration. There's no any '%2' option. To avoid this error, the intensity was changed to 'MID'.", _txtWarningHeader, _intensity];
 		_intensity = "MID";
 	};
@@ -418,6 +415,10 @@ THY_fnc_ETH_devices_intensity = {
 			_limiterDevices = round ((sqrt _kzArea) / 6);
 			_limitersByDeviceDoctrine = [ _limiterDevices, round (_limiterDevices / 1.5), round (_limiterDevices / 40), round (_limiterDevices / 50) ];  // [AP, AM, UXO, TP]
 		};
+		case "LOWEST": {
+			_limiterDevices = round ((sqrt _kzArea) / 10);
+			_limitersByDeviceDoctrine = [ _limiterDevices, round (_limiterDevices / 1.5), round (_limiterDevices / 40), round (_limiterDevices / 45) ];  // [AP, AM, UXO, TP]
+		};
 	};
 	// return:
 	_limitersByDeviceDoctrine;
@@ -428,13 +429,13 @@ THY_fnc_ETH_no_mine_topography = {
 	// This function defines all topography features where a mine SHOULD avoid to be planted for another function. More about topography features on: https://community.bistudio.com/wiki/Location
 	// Returns _noMineZonesTopography: array
 
-	params ["_kzDoctrine", "_devicePos"];
+	params ["_kzDoctrine", "_subdoctrine", "_devicePos"];
 	private ["_noMineZones"];
 
 	// Initial values:
 	_noMineZonesTopography = [];
 	// Basic validation:
-	if ( (!ETH_globalRulesTopography) OR (_kzDoctrine == "UXO") OR (_kzDoctrine == "BT") ) exitWith { _noMineZonesTopography /*Returning*/ };
+	if ( (!ETH_globalRulesTopography) OR (_kzDoctrine == "UXO") OR (_kzDoctrine == "BT") OR (_kzDoctrine == "LAM") OR (_subdoctrine == "LAM") ) exitWith { _noMineZonesTopography /*Returning*/ };
 	// Topography features:
 	_noMineZonesTopography = [
 		nearestLocation [_devicePos, "RockArea"],    // index 0
@@ -450,7 +451,7 @@ THY_fnc_ETH_no_mine_ethics = {
 	// This function defines all civilian locations where a mine SHOULD avoid to be planted for another function. More about locations on: https://community.bistudio.com/wiki/Location
 	// Returns _noMineZonesEthics: array
 
-	params ["_kzDoctrine", "_devicePos"];
+	params ["_kzDoctrine", "_subdoctrine", "_devicePos"];
 	private ["_noMineZones"];
 
 	// Initial values:
@@ -483,8 +484,8 @@ THY_fnc_ETH_inspection = {
 	// If UXO, just get out:
 	if ( _kzDoctrine == "UXO" ) exitWith { _wasDeviceDeleted /*returning*/ };  // 'cause all UXO devices will be dropped, with no rules, even in water.
 	// Global Rules checker:
-	_noMineZonesTopography = [_kzDoctrine, _devicePos] call THY_fnc_ETH_no_mine_topography;
-	_noMineZonesEthics = [_kzDoctrine, _devicePos] call THY_fnc_ETH_no_mine_ethics;
+	_noMineZonesTopography = [_kzDoctrine, _hybridSubdoctrine, _devicePos] call THY_fnc_ETH_no_mine_topography;
+	_noMineZonesEthics = [_kzDoctrine, _hybridSubdoctrine, _devicePos] call THY_fnc_ETH_no_mine_ethics;
 	// If some LAND doctrine:
 	if ( !_isNaval ) then {
 		// General land device rules > Never be planted in the water:
@@ -492,15 +493,15 @@ THY_fnc_ETH_inspection = {
 			// Delete the device if some rule is broken, and report it:
 			deleteVehicle _device; _wasDeviceDeleted = true;
 		};
-		// General land device rules > if device not deleted and topography rules true:
-		if ( !_wasDeviceDeleted AND ETH_globalRulesTopography ) then {
+		// General land device rules > if device not deleted and topography rules true, and topography returned with at least one element in its array:
+		if ( !_wasDeviceDeleted AND ETH_globalRulesTopography AND ((count _noMineZonesTopography) > 0) ) then {
 			if ( ((_devicePos distance (_noMineZonesTopography select 0)) < 100) /*OR ((_devicePos distance (_noMineZonesTopography select 1)) < 100)*/ OR ((_devicePos distance (_noMineZonesTopography select 2)) < 100) ) then {
 				// Delete the device if some rule is broken, and report it:
 				deleteVehicle _device; _wasDeviceDeleted = true;
 			};
 		}; 
-		// General land device rules > if device not deleted and Ethics rules true:
-		if ( !_wasDeviceDeleted AND ETH_globalRulesEthics ) then {
+		// General land device rules > if device not deleted and Ethics rules true, and ethics returned with at least one element in its array:
+		if ( !_wasDeviceDeleted AND ETH_globalRulesEthics AND ((count _noMineZonesEthics) > 0)) then {
 			if ( ((_devicePos distance (_noMineZonesEthics select 0)) < 200) OR ((_devicePos distance (_noMineZonesEthics select 1)) < 200) OR ((_devicePos distance (_noMineZonesEthics select 2)) < 200) OR ((_devicePos distance (_noMineZonesEthics select 3)) < 100) ) then {
 				// Delete the device if some rule is broken, and report it:
 				deleteVehicle _device; _wasDeviceDeleted = true;
@@ -509,32 +510,19 @@ THY_fnc_ETH_inspection = {
 		// If not deleted yet:
 		if ( !_wasDeviceDeleted ) then {
 			// AP land device rules only > if device not deleted and AP is on road:
-			if ( (_kzDoctrine == "AP") AND (isOnRoad _devicePos) ) then {
-				// Delete the device if some rule is broken, and report it:
-				deleteVehicle _device; _wasDeviceDeleted = true;
+			if ( (_kzDoctrine == "AP") OR (_hybridSubdoctrine == "AP") ) then {
+				// if AP over the roads, delete the device, and report it:
+				if ( isOnRoad _devicePos ) then { deleteVehicle _device; _wasDeviceDeleted = true };
 			};
-			// AM land device rules only > if device not deleted and AM is NOT on road:
-			if ( (_kzDoctrine == "AM") AND ETH_onlyOnRoadsAM AND (!isOnRoad _devicePos) ) then {
-				// Delete the device if some rule is broken, and report it:
-				deleteVehicle _device; _wasDeviceDeleted = true;
+			// LAM land device rules only > if device not deleted and LAM is NOT on road:
+			if ( (_kzDoctrine == "LAM") OR (_hybridSubdoctrine == "LAM") ) then {
+				// if LAM out of the roads, delete the device, and report it:
+				if ( !(isOnRoad _devicePos) ) then { deleteVehicle _device; _wasDeviceDeleted = true };
 			};
 			// BT land device rules only > if device not deleted and BT is on road:
 			if ( (_kzDoctrine == "BT") AND (isOnRoad _devicePos) ) then {
 				// Delete the device if some rule is broken, and report it:
 				deleteVehicle _device; _wasDeviceDeleted = true;
-			};
-			// HY land minefield rules only:
-			if ( _kzDoctrine == "HY" ) then {
-				// if subdoctrine is AP, never be planted in a road:
-				if ( (_hybridSubdoctrine == "AP") AND (isOnRoad _devicePos) ) then {
-					// Delete the device if some rule is broken, and report it:
-					deleteVehicle _device; _wasDeviceDeleted = true;
-				};
-				// if the mine not deleted and subdoctrine is AM, never be planted OUT of the road:
-				if ( (_hybridSubdoctrine == "AM") AND ETH_onlyOnRoadsAM AND (!isOnRoad _devicePos) ) then {
-					// Delete the device if some rule is broken, and report it:
-					deleteVehicle _device; _wasDeviceDeleted = true;
-				};
 			};
 		};
 	// If some NAVAL doctrine:
@@ -626,8 +614,8 @@ THY_fnc_ETH_execution_service = {
 	// This function is responsable to plant the each explosive device and, if necessary, to set its direction.
 	// Returns _wasDeviceDeleted: bool.
 
-	params ["_kz", "_kzFaction", "_ammoClassname", "_kzPos", "_kzRadius", "_kzDoctrine", "_hybridSubdoctrine", "_hideawaysList", "_isNaval"];
-	private ["_txtDebugHeader", "_txtWarningHeader", "_device", "_hideaway", "_hideawayPos", "_hideawayIndex", "_devicePos", "_wasDeviceDeleted"];
+	params ["_kz", "_kzFaction", "_ammoClassname", "_kzPos", "_kzRadius", "_kzDoctrine", "_hybridSubdoctrine", "_whereToPlant", "_isNaval"];
+	private ["_txtDebugHeader", "_txtWarningHeader", "_device", "_place", "_placePos", "_placeIndex", "_devicePos", "_wasDeviceDeleted"];
 	
 	// CPU breath:
 	sleep 0.05;  // CAUTION: without the breath, ETHICS might affect the server performance as hell.
@@ -638,35 +626,35 @@ THY_fnc_ETH_execution_service = {
 	if ( (_kzDoctrine == "HY") AND (_hybridSubdoctrine == "") ) then { systemChat format ["%1 %2 > In this doctrine is mandatory to set '_hybridSubdoctrine' at 'THY_fnc_ETH_device_planter' when is called the 'THY_fnc_ETH_execution_service' function.) ", _txtWarningHeader, _kzDoctrine] };
 	// Initial values:
 	_device = objNull;
-	_hideaway = [];
-	_hideawayIndex = nil;
+	_place = [];
+	_placeIndex = nil;
+	_placePos = [];
 	_devicePos = [];
 
-	// STEP 1 > WHEN SPECIFIC SPOTS is needed:
+	// STEP 1 > WHEN SPECIFIC PLACE is needed:
 	if ( _kzDoctrine == "BT" ) then {
-		// if there's at least one hideaway, do it:
-		if ( (count _hideawaysList) > 0 ) then {
-			// select an hidout option from the list:
-			_hideaway = selectRandom _hideawaysList;
+		// if there's at least one place into the _whereToPlant, do it:
+		if ( (count _whereToPlant) > 0 ) then {
+			// select a place option from the list:
+			_place = selectRandom _whereToPlant;
 			// Take its position:
-			_hideawayPos = getPosATL _hideaway;
+			_placePos = getPosATL _place;
 			// and delete it from the list to avoid to plant another device in same spot:
-			_hideawayIndex = _hideawaysList find _hideaway; 
-			_hideawaysList deleteAt _hideawayIndex;
+			_placeIndex = _whereToPlant find _place; 
+			_whereToPlant deleteAt _placeIndex;
 		// WIP / Otherwise debug message:
-		} else { if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The script didn't find more good hideaways for the remaining traps.", _txtDebugHeader, _kz] } };
-	// But if is other Doctrine:
+		} else { if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The script didn't find more good place for the remaining explosives.", _txtDebugHeader, _kz] } };
 	};
 
 	// STEP 2 > CREATING THE EXPLOSIVE and SETTING ITS DIRECTION:
 	// Land doctrine:
 	if ( !_isNaval ) then {
 		// CREATING:
-		if ( _kzDoctrine != "BT" ) then {
+		if ( _kzDoctrine !="BT" ) then {
 			_device = createMine [_ammoClassname, _kzPos, [], _kzRadius];
 		} else {
 			// Booby-trap device is created, forcing its Z axis position to avoid devices floating:
-			_device = createMine [_ammoClassname, [(_hideawayPos select 0), (_hideawayPos select 1), 0.1], [], 1];  // best result here with Z=0.1
+			_device = createMine [_ammoClassname, [(_placePos select 0), (_placePos select 1), 0.1], [], 1];  // best result here with Z=0.1
 		};
 		// GETTING POSITION releated by terrain level, including sea floor: https://community.bistudio.com/wiki/File:position.jpg
 		_devicePos = getPosATL _device;
@@ -727,10 +715,10 @@ THY_fnc_ETH_device_planter = {
 	// Returns _deviceAmountsByDoctrine: array [AP [planted, deleted], AM [planted, deleted], UXO [planted, deleted]]
 
 	params ["_kzNameStructure", "_ammoLandAP", "_ammoLandAM", "_ammoNavalAM", "_ammoPackUXO", "_ammoTrapBT", "_kz", "_kzSize", "_limiterDeviceAmounts", "_deviceAmountsByDoctrine"];
-	private ["_kzDoctrine", "_kzFaction", "_kzPos", "_kzRadius", "_limiterAmountAP", "_limiterAmountAM", "_limiterAmountUXO", "_limiterAmountTP", "_limiterMultiplier", "_limiterDevicesDeletedAP", "_limiterDevicesDeletedAM", "_limiterDevicesDeletedUXO", "_limiterDevicesDeletedTP", "_allDevicesPlantedAP", "_allDevicesDeletedAP", "_allDevicesPlantedAM", "_allDevicesDeletedAM", "_allDevicesPlantedUXO", "_allDevicesDeletedUXO", "_allDevicesPlantedTP", "_allDevicesDeletedTP","_devicesPlantedAP", "_devicesDeletedAP", "_devicesPlantedAM", "_devicesDeletedAM", "_devicesPlantedUXO", "_devicesDeletedUXO", "_devicesPlantedTP", "_devicesDeletedTP", "_wasDeviceDeleted", "_ammoUXO", "_hideaways"];
+	private ["_txtDebugHeader", "_kzDoctrine", "_kzFaction", "_kzPos", "_kzRadius", "_limiterAmountAP", "_limiterAmountAM", "_limiterAmountUXO", "_limiterAmountTP", "_limiterMultiplier", "_limiterDevicesDeletedAP", "_limiterDevicesDeletedAM", "_limiterDevicesDeletedUXO", "_limiterDevicesDeletedTP", "_allDevicesPlantedAP", "_allDevicesDeletedAP", "_allDevicesPlantedAM", "_allDevicesDeletedAM", "_allDevicesPlantedUXO", "_allDevicesDeletedUXO", "_allDevicesPlantedTP", "_allDevicesDeletedTP","_devicesPlantedAP", "_devicesDeletedAP", "_devicesPlantedAM", "_devicesDeletedAM", "_devicesPlantedUXO", "_devicesDeletedUXO", "_devicesPlantedTP", "_devicesDeletedTP", "_wasDeviceDeleted", "_ammoUXO", "_hideaways"];
 
 	// Debug txts:
-	//private _txtDebugHeader = "ETHICS DEBUG >";
+	_txtDebugHeader = "ETHICS DEBUG >";
 	//private _txtWarningHeader = "ETHICS WARNING >";
 	// Config from Kill zone Name Structure:
 	_kzDoctrine = _kzNameStructure select 1;
@@ -749,7 +737,7 @@ THY_fnc_ETH_device_planter = {
 	_limiterDevicesDeletedAM = _limiterAmountAM * _limiterMultiplier;
 	_limiterDevicesDeletedUXO = _limiterAmountUXO * _limiterMultiplier;  // P.S: Actually, UXO can't be deleted as its Doctrine rule in not follow other rules.
 	_limiterDevicesDeletedTP = _limiterAmountTP * _limiterMultiplier;
-	// Mines' numbers of the sum of the other kill zones priviously loaded by this function:
+	// Devices' numbers of the sum of the other kill zones priviously loaded by this function:
 	_allDevicesPlantedAP = (_deviceAmountsByDoctrine select 0) select 0;
 	_allDevicesDeletedAP = (_deviceAmountsByDoctrine select 0) select 1;
 	_allDevicesPlantedAM = (_deviceAmountsByDoctrine select 1) select 0;
@@ -758,7 +746,7 @@ THY_fnc_ETH_device_planter = {
 	_allDevicesDeletedUXO = (_deviceAmountsByDoctrine select 2) select 1;
 	_allDevicesPlantedTP = (_deviceAmountsByDoctrine select 3) select 0;
 	_allDevicesDeletedTP = (_deviceAmountsByDoctrine select 3) select 1;
-	// Mines' numbers only for this _kz:
+	// Devices' numbers only for this _kz:
 	_devicesPlantedAP = _limiterAmountAP;
 	_devicesDeletedAP = 0;
 	_devicesPlantedAM = _limiterAmountAM;
@@ -767,7 +755,9 @@ THY_fnc_ETH_device_planter = {
 	_devicesDeletedUXO = 0;  // Actually, UXO can't be deleted as its Doctrine rule in not follow other rules.
 	_devicesPlantedTP = _limiterAmountTP;
 	_devicesDeletedTP = 0;
-	// Mine planter rules by doctrine:
+	// Debug message:
+	if ( ETH_debug ) then { sleep 1; systemChat format ["%1 Marker '%2' > Planting the explosives...", _txtDebugHeader, _kz] };
+	// Device planter rules by doctrine:
 	switch ( _kzDoctrine ) do {
 		// LAND ANTI-PERSONNEL, planting all of them at once:
 		case "AP": {
@@ -783,8 +773,22 @@ THY_fnc_ETH_device_planter = {
 			// Update with total numbers to return:
 			_deviceAmountsByDoctrine = [[(_allDevicesPlantedAP + _devicesPlantedAP), (_allDevicesDeletedAP + _devicesDeletedAP)], [_allDevicesPlantedAM, _allDevicesDeletedAM], [_allDevicesPlantedUXO, _allDevicesDeletedUXO], [_allDevicesPlantedTP, _allDevicesDeletedTP]];
 		};
-		// LAND ANTI-MATERIAL, planting all of them at once:
+		// LAND ANTI-MATERIEL, planting all of them at once:
 		case "AM": {
+			// Looping > Device amount planting in a row:
+			for "_i" from 1 to _limiterAmountAM do {
+				// Execute the device planting:
+				_wasDeviceDeleted = [_kz, _kzFaction, _ammoLandAM, _kzPos, _kzRadius, _kzDoctrine, "", [], false] call THY_fnc_ETH_execution_service;
+				// If something went wrong, deleted amount of explosive devices:
+				if ( _wasDeviceDeleted ) then { _devicesDeletedAM = _devicesDeletedAM + 1 };
+			};
+			// Debug Kill zone feedbacks:
+			[_kzDoctrine, _kz, _devicesPlantedAM, _devicesDeletedAM, _limiterDevicesDeletedAM, ETH_debug, "", ""] call THY_fnc_ETH_done_feedbacks;
+			// Update with total numbers to return:
+			_deviceAmountsByDoctrine = [[_allDevicesPlantedAP, _allDevicesDeletedAP], [(_allDevicesPlantedAM + _devicesPlantedAM), (_allDevicesDeletedAM + _devicesDeletedAM)], [_allDevicesPlantedUXO, _allDevicesDeletedUXO], [_allDevicesPlantedTP, _allDevicesDeletedTP]]; 
+		};
+		// LAND LIMITED ANTI-MATERIEL, planting all of them at once:
+		case "LAM": {
 			// Looping > Device amount planting in a row:
 			for "_i" from 1 to _limiterAmountAM do {
 				// Execute the device planting:
@@ -799,13 +803,13 @@ THY_fnc_ETH_device_planter = {
 		};
 		// LAND HYBRID, planting all combined mines at once:
 		case "HY": {
-			// Reducing a each mine type for the combination amount doesn't except too much the limits:
-			_limiterAmountAP = round (_limiterAmountAP / 1.3);  // Makes AP proporsion bigger than AM.
-			if ( !ETH_onlyOnRoadsAM ) then { _limiterAmountAM = round (_limiterAmountAM / 3) };  // if AM only on roads, AM works with its full amount 'cause plant a mine only on road is rare.
-			// Combined doctrines need recalculate the mine types' limeters:
+			// Reducing each device subdoctrine for the combination amount doesn't except the regular limits:
+			_limiterAmountAP = round (_limiterAmountAP / 1.5);  // Makes AP (66%) proporsion bigger than AM (33%).
+			_limiterAmountAM = round (_limiterAmountAM / 3);
+			// Subdoctrines need recalculate the mine types' limeters:
 			_limiterDevicesDeletedAP = _limiterAmountAP * _limiterMultiplier;
 			_limiterDevicesDeletedAM = _limiterAmountAM * _limiterMultiplier;
-			// Needed to include Hybrid solution correctly in final mines balance:
+			// Needed to include Hybrid solution correctly in final devices balance:
 			_devicesPlantedAP = _limiterAmountAP;
 			_devicesPlantedAM = _limiterAmountAM;
 			// Looping > AP amount planting in a row:
@@ -828,7 +832,38 @@ THY_fnc_ETH_device_planter = {
 			// Update with total numbers to return:
 			_deviceAmountsByDoctrine = [[(_allDevicesPlantedAP + _devicesPlantedAP), (_allDevicesDeletedAP + _devicesDeletedAP)], [(_allDevicesPlantedAM + _devicesPlantedAM), (_allDevicesDeletedAM + _devicesDeletedAM)], [_allDevicesPlantedUXO, _allDevicesDeletedUXO], [_allDevicesPlantedTP, _allDevicesDeletedTP]];
 		};
-		// NAVAL ANTI-MAERIAL, planting all of them at once:
+		// LAND HYBRID, planting all combined mines at once:
+		case "LHY": {
+			// Reducing each device subdoctrine for the combination amount doesn't except the regular limits:
+			_limiterAmountAP = round (_limiterAmountAP / 1.5);
+			//_limiterAmountAM = round (_limiterAmountAM / 2);  // Commented because is needed increasing a bit the LAM limiter. If LOWEST intensity, it will be rare enough.
+			// Subdoctrines need recalculate the mine types' limeters:
+			_limiterDevicesDeletedAP = _limiterAmountAP * _limiterMultiplier;
+			_limiterDevicesDeletedAM = _limiterAmountAM * _limiterMultiplier;
+			// Needed to include Hybrid solution correctly in final devices balance:
+			_devicesPlantedAP = _limiterAmountAP;
+			_devicesPlantedAM = _limiterAmountAM;
+			// Looping > AP amount planting in a row:
+			for "_i" from 1 to _limiterAmountAP do {
+				// Execute the device planting:
+				_wasDeviceDeleted = [_kz, _kzFaction, _ammoLandAP, _kzPos, _kzRadius, _kzDoctrine, "AP", [], false] call THY_fnc_ETH_execution_service;
+				// If something went wrong, deleted amount of explosive devices:
+				if ( _wasDeviceDeleted ) then { _devicesDeletedAP = _devicesDeletedAP + 1 };
+			};
+			// Looping > LAM amount planting in a row:
+			for "_i" from 1 to _limiterAmountAM do {
+				// Execute the device planting:
+				_wasDeviceDeleted = [_kz, _kzFaction, _ammoLandAM, _kzPos, _kzRadius, _kzDoctrine, "LAM", [], false] call THY_fnc_ETH_execution_service;
+				// If something went wrong, deleted amount of explosive devices:
+				if ( _wasDeviceDeleted ) then { _devicesDeletedAM = _devicesDeletedAM + 1 };
+			};
+			// Debug Kill zone feedbacks:
+			[_kzDoctrine, _kz, _devicesPlantedAP, _devicesDeletedAP, _limiterDevicesDeletedAP, ETH_debug, "Limited Hybrid", "AP"] call THY_fnc_ETH_done_feedbacks;
+			[_kzDoctrine, _kz, _devicesPlantedAM, _devicesDeletedAM, _limiterDevicesDeletedAM, ETH_debug, "Limited Hybrid", "LAM"] call THY_fnc_ETH_done_feedbacks;
+			// Update with total numbers to return:
+			_deviceAmountsByDoctrine = [[(_allDevicesPlantedAP + _devicesPlantedAP), (_allDevicesDeletedAP + _devicesDeletedAP)], [(_allDevicesPlantedAM + _devicesPlantedAM), (_allDevicesDeletedAM + _devicesDeletedAM)], [_allDevicesPlantedUXO, _allDevicesDeletedUXO], [_allDevicesPlantedTP, _allDevicesDeletedTP]];
+		};
+		// NAVAL ANTI-MATERIEL, planting all of them at once:
 		case "NAM": {
 			// Looping > Device amount planting in a row:
 			for "_i" from 1 to _limiterAmountAM do {
@@ -909,25 +944,25 @@ THY_fnc_ETH_done_feedbacks = {
 		if ( _debug AND (_devicesDeleted < _limiterMinesDeleted) ) then { 
 			// If no mines deleted:
 			if ( _devicesDeleted == 0 ) then {
-				systemChat format ["%1 Marker '%2' > Got all %3 %4 devices planted successfully.", _txtDebugHeader, _kz, _devicesPlanted, _kzDoctrine];
+				systemChat format ["%1 Marker '%2' > %3 > Got all %4 devices planted successfully.", _txtDebugHeader, _kz, _kzDoctrine, _devicesPlanted];
 			// Otherwise, just a few mines deleted:
 			} else {
-				systemChat format ["%1 Marker '%2' > From %3 %4 devices planted, %5 were deleted (balance: %6).", _txtDebugHeader, _kz, _devicesPlanted, _kzDoctrine, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
+				systemChat format ["%1 Marker '%2' > %3 > From %4 devices planted, %5 were deleted (balance: %6).", _txtDebugHeader, _kz, _kzDoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
 			};
 		// If not fine, probably some mission editor's action is required:
 		} else {
 			// If lots of mines deleted:
 			if ( _devicesDeleted > _limiterMinesDeleted ) then {
-				// If ETH_onlyOnRoadsAM OFF:
-				if ( !ETH_onlyOnRoadsAM ) then {
+				// If it's NOT LAM:
+				if ( _kzDoctrine != "LAM" ) then {
 					// Warning message:
 					systemChat format ["%1 Marker '%2' > %3 > %4", _txtWarningHeader, _kz, _kzDoctrine, _txtWarning_4];
-				// if ETH_onlyOnRoadsAM ON:
+				// if it's LAM:
 				} else {
-					// just show the regular debug message for AM if, at least, one AM was planted:
+					// just show the regular debug message for LAM if, at least, one LAM was planted:
 					if ( ETH_debug AND ((_devicesPlanted - _devicesDeleted) != 0) ) then { 
 						systemChat format ["%1 Marker '%2' > %3 > From %4 devices planted, %5 were deleted (balance: %6).", _txtDebugHeader, _kz, _kzDoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
-					// Otherwise, you finally got a rare scenario to check :P
+					// Otherwise, you finally got a rare scenario to check:
 					} else {
 						systemChat format ["%1 Marker '%2' > %3 > %4", _txtWarningHeader, _kz, _kzDoctrine, _txtWarning_5];
 					};
@@ -940,34 +975,25 @@ THY_fnc_ETH_done_feedbacks = {
 		if ( _devicesDeleted < _limiterMinesDeleted ) then { 
 			// If no mines deleted:
 			if ( _devicesDeleted == 0 ) then {
-				if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > %3 > Got all %4 %5 devices planted successfully.", _txtDebugHeader, _kz, _hybridTitle, _devicesPlanted, _subdoctrine] };
+				if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > %3 > %4 > Got all %5 devices planted successfully.", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted] };
 			// Otherwise, just a few mines deleted:
 			} else {
 				if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)] };
 			};
-		// Otherwise, if some issue:
+		// Otherwise, if the amount of devices-deleted is bigger than the limiter of devices-deleted:
 		} else {
-			// if too much mines were deleted:
-			if ( _devicesDeleted > _limiterMinesDeleted) then {
-				// If ETH_onlyOnRoadsAM is OFF:
-				if ( !ETH_onlyOnRoadsAM ) then {
-					// Warming message:
-					systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_4];
-				// Otherwise, if ETH_onlyOnRoadsAM is ON:
+			// If it's NOT LAM:
+			if ( _subdoctrine != "LAM" ) then {
+				// Warming message:
+				systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_4];
+			// Otherwise, if it's LAN:
+			} else {
+				// just show the regular debug message for HY LAM if, at least, one LAM was planted:
+				if ( ETH_debug AND ((_devicesPlanted - _devicesDeleted) != 0) ) then { 
+					systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
+				// Otherwise, you finally got a rare scenario to check:
 				} else {
-					// Warming message only if the subdoctrine is not AM (because HY AM is so rare to be planted when ETH_onlyOnRoadsAM is ON. This avoid this message only in this case):
-					if ( _subdoctrine != "AM" ) then { 
-						systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_4];
-					// Otherwise...
-					} else {
-						// just show the regular debug message for AM if, at least, one AM was planted:
-						if ( ETH_debug AND ((_devicesPlanted - _devicesDeleted) != 0) ) then { 
-							systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", _txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
-						// Otherwise, you finally got a rare scenario to check :P
-						} else {
-							systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_5];
-						};
-					};
+					systemChat format ["%1 Marker '%2' > %3 > %4 > %5", _txtWarningHeader, _kz, _hybridTitle, _subdoctrine, _txtWarning_5];
 				};
 			};
 		};
@@ -995,7 +1021,7 @@ THY_fnc_ETH_debug = {
 		"Devices' intensity = %4\n" +
 		"Initial ETH AP planted = %5\n" +
 		"Initial ETH AM planted = %6\n" +
-		"Initial ETH UXO dropped = %7\n" +
+		"Initial ETH UXO planted = %7\n" +
 		"Initial ETH Traps planted = %8\n" +
 		"Initial No-ETH planted = %9\n" +
 		"Current all devices = %10\n" +
