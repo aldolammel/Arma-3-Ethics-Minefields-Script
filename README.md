@@ -42,6 +42,7 @@ __
 
 - Added > Explosive device preset's intensity: "lowest";
 - Improvement > Limited Anti-Material is a specific doctrine called "LAM";
+- Improvement > Debug monitor now is saying when a kill zone starts to plant its explosives, and when the whole script execution is done;
 - Documentation has been updated.
 
 **Feb, 4th 2023 | v1.5**
