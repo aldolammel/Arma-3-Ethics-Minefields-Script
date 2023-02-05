@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5.2
+// ETHICS MINEFIELDS v1.5.3
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
