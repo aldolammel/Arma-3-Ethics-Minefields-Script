@@ -8,7 +8,7 @@ class EditorData
 	toggles=1537;
 	class ItemIDProvider
 	{
-		nextID=115;
+		nextID=116;
 	};
 	class MarkerIDProvider
 	{
@@ -16,14 +16,14 @@ class EditorData
 	};
 	class LayerIndexProvider
 	{
-		nextID=11;
+		nextID=13;
 	};
 	class Camera
 	{
 		pos[]={13785.555,36.754734,19270.834};
-		dir[]={-0.032008242,-0.25461325,-0.96651942};
-		up[]={-0.0084274048,0.96703887,-0.25447688};
-		aside[]={-0.99945682,1.2647752e-007,0.033098184};
+		dir[]={-0.032009322,-0.25461167,-0.96651351};
+		up[]={-0.0084276954,0.9670434,-0.25447217};
+		aside[]={-0.99945205,0,0.033100195};
 	};
 };
 binarizationWanted=0;
@@ -127,7 +127,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=9;
+		items=10;
 		class Item0
 		{
 			dataType="Layer";
@@ -244,7 +244,7 @@ class Mission
 						dynamicSimulation=1;
 					};
 					id=18;
-					atlOffset=1.9073486e-006;
+					atlOffset=185.97;
 				};
 				class Item2
 				{
@@ -340,6 +340,7 @@ class Mission
 						dynamicSimulation=1;
 					};
 					id=9;
+					atlOffset=185.97;
 				};
 				class Item3
 				{
@@ -434,6 +435,7 @@ class Mission
 						dynamicSimulation=1;
 					};
 					id=13;
+					atlOffset=185.97;
 				};
 				class Item4
 				{
@@ -609,13 +611,13 @@ class Mission
 				};
 			};
 			id=1;
-			atlOffset=-30.858912;
+			atlOffset=-73.289696;
 		};
 		class Item1
 		{
 			dataType="Marker";
 			position[]={14184.304,1.666,18250.658};
-			name="killzone_hy_blu_2";
+			name="killzone_HY_blu_1";
 			markerType="ELLIPSE";
 			type="";
 			a=1037.325;
@@ -627,11 +629,11 @@ class Mission
 		{
 			dataType="Marker";
 			position[]={10372.842,121.242,19042.646};
-			name="killzone_am_blu_3";
+			name="killzone_AM_blu_1";
 			markerType="ELLIPSE";
 			type="";
-			a=812.15088;
-			b=812.15088;
+			a=812.151;
+			b=812.151;
 			id=5;
 			atlOffset=-2.5585251;
 		};
@@ -640,7 +642,7 @@ class Mission
 			dataType="Marker";
 			position[]={4598.084,0,23723.807};
 			name="marker-script-version";
-			text="    VERSION FEB, 4th 2023";
+			text="    VERSION FEB, 5th 2023";
 			type="mil_box";
 			id=23;
 			atlOffset=165.30959;
@@ -648,20 +650,20 @@ class Mission
 		class Item4
 		{
 			dataType="Marker";
-			position[]={14626.454,20.395935,22961.658};
-			name="killzone_nam_ind_1";
+			position[]={14626.454,20.396,22961.658};
+			name="killzone_NAM_ind_1";
 			markerType="ELLIPSE";
 			type="";
-			a=971.88696;
-			b=971.88696;
+			a=971.88702;
+			b=971.88702;
 			id=25;
-			atlOffset=9.8607769;
+			atlOffset=9.8608418;
 		};
 		class Item5
 		{
 			dataType="Marker";
 			position[]={9537.5947,-4.572,21897.566};
-			name="killzone_ap_opf_2";
+			name="killzone_AP_opf_1";
 			markerType="ELLIPSE";
 			type="";
 			a=1086.663;
@@ -672,20 +674,20 @@ class Mission
 		class Item6
 		{
 			dataType="Marker";
-			position[]={7418.6001,157.12601,17147.145};
-			name="killzone_am_1";
+			position[]={7482.3491,151.771,17504.145};
+			name="killzone_LAM_1";
 			markerType="ELLIPSE";
 			type="";
 			a=790.573;
 			b=790.573;
 			id=27;
-			atlOffset=-0.78825378;
+			atlOffset=-35.274979;
 		};
 		class Item7
 		{
 			dataType="Marker";
 			position[]={16561.906,15.995,19902.799};
-			name="killzone_uxo_1";
+			name="killzone_UXO_1";
 			markerType="ELLIPSE";
 			type="";
 			a=704.54199;
@@ -696,14 +698,26 @@ class Mission
 		class Item8
 		{
 			dataType="Marker";
-			position[]={6145.9199,194.41943,20033.773};
-			name="killzone_bt_1";
+			position[]={6145.9199,194.41901,20033.773};
+			name="killzone_BT_1";
 			markerType="ELLIPSE";
 			type="";
 			a=500;
 			b=500;
 			id=39;
-			atlOffset=-7.8574371;
+			atlOffset=-7.8578644;
+		};
+		class Item9
+		{
+			dataType="Marker";
+			position[]={12193.592,41.480999,18802.389};
+			name="killzone_LHY_blu_1";
+			markerType="ELLIPSE";
+			type="";
+			a=812.151;
+			b=812.151;
+			id=115;
+			atlOffset=-0.82223892;
 		};
 	};
 };
