@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5.3.1
+// ETHICS MINEFIELDS v1.7
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -7,7 +7,7 @@
 
 
 THY_fnc_ETH_marker_name_splitter = {
-	// This function splits the marker name to check if the name has the basic structure for further validations.
+	// This function splits the area-marker's name to check if the name has the basic structure for further validations.
 	// Returns _kzNameStructure: array
 
 	params ["_markerName", "_prefix", "_spacer"];
@@ -23,7 +23,7 @@ THY_fnc_ETH_marker_name_splitter = {
 	_kzNameStructureRaw = _markerName splitString "";
 	_spacerAmount = count (_kzNameStructureRaw select {_x find _spacer isEqualTo 0});  // counting how many times the same character appers in a string.
 	// if the _spacer is been used correctly:
-	if ( _spacerAmount == 2 OR _spacerAmount == 3 ) then {
+	if ( (_spacerAmount >= 2) AND (_spacerAmount <= 4) ) then {
 		// spliting the marker name to check its structure:
 		_kzNameStructureRaw = _markerName splitString _spacer;
 	// Otherwise, if the _spacer is NOT been used correctly:
@@ -43,7 +43,7 @@ THY_fnc_ETH_marker_scanner = {
 	// Returns _confirmedKzMarkers: array [[area markers of factions], [area markers of unknown owner], [area markers of UXO]]
 
 	params ["_prefix", "_spacer"];
-	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzFactionMarkers", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzFaction", "_isNumber"];
+	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_0", "_txtWarning_1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzFactionMarkers", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzFaction", "_isKzPresent", "_isNumber"];
 
 	// Declarations:
 	_realPrefix = _prefix + _spacer;
@@ -51,6 +51,7 @@ THY_fnc_ETH_marker_scanner = {
 	// Debug txts:
 	_txtDebugHeader = "ETHICS DEBUG >";
 	_txtWarningHeader = "ETHICS WARNING >";
+	_txtWarning_0 = "This mission still has no possible kill zone(s) to be loaded.";
 	_txtWarning_1 = format ["If the intension is to make it a kill zone, its structure name must be '%1%2TagDoctrine%2TagFaction%2anynumber' or '%1%2TagDoctrine%2anynumber'.", _prefix, _spacer];
 	// Initial values:
 	_confirmedKzMarkers = [];
@@ -60,12 +61,12 @@ THY_fnc_ETH_marker_scanner = {
 	if ( !ETH_debug ) then {
 		// Smarter and faster solution, searching and creating the list:
 		_possibleKzMarkers = allMapMarkers select { (_x find _realPrefix == 0) AND {(markerShape _x) in _acceptableShapes} };
-		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 This mission still has no possible kill zone(s) to be loaded. %2", _txtWarningHeader, _txtWarning_1] };
+		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_0, _txtWarning_1] };
 	// As the slower solution, for debugging purporses:
 	} else {
 		 // Selecting the relevant markers in a slightly different way. Now searching for all marker shapes:
 		_possibleKzMarkers = allMapMarkers select { _x find _realPrefix == 0 };
-		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 This mission still has no possible kill zone(s) to be loaded. %2", _txtWarningHeader, _txtWarning_1] };
+		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_0, _txtWarning_1] };
 		{ // forEach _possibleKzMarkers:
 			// if the marker has no the shapes acceptables, do it:
 			if ( !((markerShape _x) in _acceptableShapes) ) then {
@@ -84,26 +85,61 @@ THY_fnc_ETH_marker_scanner = {
 		_kzNameStructure = [_x, _prefix, _spacer] call THY_fnc_ETH_marker_name_splitter;
 		// Case by case, check the valid marker name's amounts of strings:
 		switch ( count _kzNameStructure ) do {
-			// Case example: mf_ap_1
+			// Case example: killzone_ap_1
 			case 3: {
 				// Check if the doctrine tag is correctly applied:
-				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_session_doctrine;  // So far, I'm NOT using this _kzDoctrine return 'cause I'm handling the error within.
-				// Check if the last session of the area marker name is numeric:
-				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_session_number;
+				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // So far, I'm NOT using this _kzDoctrine return 'cause I'm handling the error within.
+				// Check if the last section of the area marker name is numeric:
+				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
 				if ( (_kzDoctrine != "") AND _isNumber ) then {
 					// If is a non-faction kill zone marker:
 					_confirmedKzUnknownMarkers append [_x];
 				};
 			};
-			// Case example: mf_ap_ind_2
-			case 4: { 
+			// Case example: killzone_ap_ind_1   or   killzone_ap_75%_1
+			case 4: {
+				// Check if the presence tag is correctly applied:
+				_isKzPresent = [_kzNameStructure, _x, _spacer] call THY_fnc_ETH_marker_name_section_presence;  // if presence not valid, returns presence 100, otherwise the real probability.
+				// if the area-marker did'nt spawn, abort and delete the marker from _possibleKzMarkers:
+				if ( !_isKzPresent ) exitWith { 
+					if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The configured probability deleted the marker.", _txtDebugHeader, _x] };
+					_possibleKzMarkers deleteAt (_possibleKzMarkers find _x); 
+				};
 				// Check if the doctrine tag is correctly applied:
-				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_session_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
+				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
 				// Check if the faction tag is correctly applied:
-				_kzFaction = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_session_faction;  // if faction not valid, returns "", otherwise it returns the faction.
-				// Check if the last session of the area-marker name is numeric:
-				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_session_number;
+				_kzFaction = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_faction;  // if faction not valid, returns "", otherwise it returns the faction.
+				// Check if the last section of the area-marker name is numeric:
+				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
+				// If all validations alright:
+				if ( (_kzDoctrine != "") AND (_kzDoctrine != "UXO") AND (_kzFaction != "") AND _isNumber ) then {
+					// add this kill zone in the right array:
+					_confirmedKzFactionMarkers append [_x];
+				// Otherwise:
+				} else {
+					// if UXO doctrine or has no faction:
+					if ( (_kzDoctrine == "UXO") OR (_kzFaction == "") ) then {
+						// add this kill zone in the right array:
+						_confirmedKzUnknownMarkers append [_x];
+					};
+				};
+			};
+			// Case example: killzone_ap_ind_75%_1
+			case 5: {
+				// Check if the presence tag is correctly applied:
+				_isKzPresent = [_kzNameStructure, _x, _spacer] call THY_fnc_ETH_marker_name_section_presence;  // if presence not valid, returns presence 100, otherwise the real probability.
+				// if the area-marker did'nt spawn, abort and delete the marker from _possibleKzMarkers:
+				if ( !_isKzPresent ) exitWith { 
+					if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The configured probability deleted the marker.", _txtDebugHeader, _x] };
+					_possibleKzMarkers deleteAt _x; 
+				};
+				// Check if the doctrine tag is correctly applied:
+				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
+				// Check if the faction tag is correctly applied:
+				_kzFaction = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_faction;  // if faction not valid, returns "", otherwise it returns the faction.
+				// Check if the last section of the area-marker name is numeric:
+				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
 				if ( (_kzDoctrine != "") AND (_kzDoctrine != "UXO") AND (_kzFaction != "") AND _isNumber ) then {
 					// add this kill zone in the right array:
@@ -164,8 +200,8 @@ THY_fnc_ETH_available_doctrines = {
 
 
 
-THY_fnc_ETH_marker_name_session_doctrine = {
-	// This function checks the second session (mandatory) of the area marker's name, validating if the session is a valid ammunition doctrine.
+THY_fnc_ETH_marker_name_section_doctrine = {
+	// This function checks the second section (mandatory) of the area marker's name, validating if the section is a valid ammunition doctrine.
 	// Returns _kzDoctrine: when valid, doctrine tag as string. When invalid, an empty string ("").
 
 	params ["_kzNameStructure", "_kz", "_isServerRequest"];
@@ -189,20 +225,115 @@ THY_fnc_ETH_marker_name_session_doctrine = {
 };
 
 
-THY_fnc_ETH_marker_name_session_faction = {
-	// This function checks the optional session of the area marker's name, validating if the session is a valid faction.
+THY_fnc_ETH_presence_percentage_checker = {
+	// This function takes the presence tag and convert it to an integer percentage for further validations.
+	// Returns _realPercentage: integer.
+
+	params ["_kz", "_kzPresence", "_spacer"];
+	private ["_txtWarningHeader", "_txtWarning_6", "_txtWarning_7", "_sectionChecker", "_stringNumbersMerged", "_itShouldBeNumeric", "_realPercentage"];
+
+	// Debug txts:
+	//private _txtDebugHeader = "ETHICS DEBUG >";
+	_txtWarningHeader = "ETHICS WARNING >";
+	_txtWarning_6 = format ["Marker '%1' > Percentage tag looks wrong ('%3%2%3').", _kz, _kzPresence, _spacer];
+	_txtWarning_7 = "To handle the error, the script will ignore this Presence Tag.";
+	// Initial values:
+	_stringNumbersMerged = "";
+	_realPercentage = 100;
+	// Declarations:
+	_sectionChecker = _kzPresence splitString "";
+	// Is there the percentage character:
+	if ( "%" in _sectionChecker ) then {
+		// So delete it from the list to isolated that supposed to be just numbers:
+		_sectionChecker deleteAt (_sectionChecker find "%");
+		// If has no numbers in presence section, warning the editor:
+		if ( (count _sectionChecker) == 0 ) then {
+			systemChat format ["%1 %2", _txtWarningHeader, _txtWarning_6];
+		// Otherwise, check the numbers:
+		} else {
+			// if more than one string, merge them, otherwise, keep going:
+			if ( (count _sectionChecker) > 1 ) then { _stringNumbersMerged = _sectionChecker joinString "" } else { _stringNumbersMerged = _sectionChecker select 0 };	
+			// Converting from string to integer:
+			_itShouldBeNumeric = parseNumber _stringNumbersMerged;  // result will be a number extracted from string OR ZERO if inside the string has no numbers.
+			// if the conversion works:
+			if ( _itShouldBeNumeric != 0 ) then {
+				// if the number is between 0 and 100, keep going:
+				if ( _itShouldBeNumeric >= 1 AND _itShouldBeNumeric <= 100 ) then {
+					// Convert a possible float number to integer:
+					_realPercentage = round _itShouldBeNumeric;
+				// Otherwise warning alert:
+				} else { systemChat format ["%1 %2 You must use a number between 1 and 100. %3", _txtWarningHeader, _txtWarning_6, _txtWarning_7] };
+			// if the conversion fails, warning alert:
+			} else { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_6, _txtWarning_7] };
+		};
+	};
+	// Return:
+	_realPercentage;
+};
+
+
+THY_fnc_ETH_marker_name_section_presence = {
+	// This function checks the optional section of the area marker's name, calculation the kill zone's probability to be available in-game.
+	// Returns _isKzPresent: bool.
+
+	params ["_kzNameStructure", "_kz", "_spacer"];
+	private ["_txtWarningHeader", "_isKzPresent", "_kzPresence", "_sectionsAvailable", "_realPercentage"];
+
+	// Debug txts:
+	//private _txtDebugHeader = "ETHICS DEBUG >";
+	_txtWarningHeader = "ETHICS WARNING >";
+	// Initial values:
+	_isKzPresent = true;
+	_kzPresence = "";
+	// Declarations:
+	_sectionsAvailable = count (_kzNameStructure);
+
+	switch ( _sectionsAvailable ) do {
+		// Example: killzone_AP_75%_1
+		case 4: {
+			_kzPresence = _kzNameStructure select 2;
+			_realPercentage = [_kz, _kzPresence, _spacer] call THY_fnc_ETH_presence_percentage_checker;
+		};
+		// Example: killzone_AP_blu_75%_1
+		case 5: {
+			_kzPresence = _kzNameStructure select 3;
+			_realPercentage = [_kz, _kzPresence, _spacer] call THY_fnc_ETH_presence_percentage_checker;
+		};
+	};
+	// Calculationg the probability of the kill zone to be present in-game:
+	if ( _realPercentage < (random 100) ) then {
+		// delete the marker (only for security):
+		deleteMarker _kz;
+		// Update to return:
+		_isKzPresent = false;
+	};
+	// Return:
+	_isKzPresent;
+};
+
+
+THY_fnc_ETH_marker_name_section_faction = {
+	// This function checks the optional section of the area marker's name, validating if the section is a valid faction.
 	// Returns _kzFaction: when valid, faction tag as string. When invalid, an empty string ("").
 
 	params ["_kzNameStructure", "_kz", "_isServerRequest"];
-	private ["_txtWarningHeader", "_kzFaction", "_kzDoctrine"];
+	private ["_txtWarningHeader", "_kzDoctrine", "_kzFaction", "_thirdSectionChecker"];
 
 	// Debug txts:
 	//private _txtDebugHeader = "ETHICS DEBUG >";
 	_txtWarningHeader = "ETHICS WARNING >";
 	// Declarations:
-	_kzFaction = _kzNameStructure select 2;
 	_kzDoctrine = _kzNameStructure select 1;
-	// Handling errors:
+	_kzFaction = _kzNameStructure select 2;
+	// Handling errors > if Presence section, abort the function:
+	_thirdSectionChecker = _kzFaction splitString "";
+	if ( "%" in _thirdSectionChecker ) exitWith {
+		// Updationg before to return:
+		_kzFaction = "";
+		// Return:
+		_kzFaction;
+	};
+	// Handling errors > if UXO doctrine, abort the function:
 	if ( _kzDoctrine == "UXO" ) exitWith {
 		// When feedback off, the message doesnt duplicate for mission editor (because the function also is called by LocalPlayer and not only in server side):
 		if ( _isServerRequest ) then {
@@ -219,6 +350,7 @@ THY_fnc_ETH_marker_name_session_faction = {
 		if ( _isServerRequest ) then {
 			systemChat format ["%1 Marker '%2' > The faction tag looks wrong. There's no '%3' option. For this kill zone owner, it was changed to unknown.", _txtWarningHeader, _kz, _kzFaction];
 		};
+		// Updationg before to return:
 		_kzFaction = "";
 	};
 	// Return:
@@ -226,8 +358,8 @@ THY_fnc_ETH_marker_name_session_faction = {
 };
 
 
-THY_fnc_ETH_marker_name_session_number = {
-	// This function checks the last session (mandatory) of the area marker's name, validating if the session is numeric;
+THY_fnc_ETH_marker_name_section_number = {
+	// This function checks the last section (mandatory) of the area marker's name, validating if the section is numeric;
 	// Returns _isNumber: bool.
 
 	params ["_kzNameStructure", "_kz", "_prefix", "_spacer"];
@@ -241,7 +373,9 @@ THY_fnc_ETH_marker_name_session_number = {
 	_isNumber = false;
 	_index = nil;
 	// Number validation:
-	if ( (count _kzNameStructure) == 3 ) then { _index = 2 } else { _index = 3 }; // it's needed because marker names can have 3 or 4 sessions, depends if the faction tag is been used.
+	if ( (count _kzNameStructure) == 3 ) then { _index = 2 };  // it's needed because marker names can have 3, 4 or 5 sections, depends if the Faction tag is been used and Presence tag.
+	if ( (count _kzNameStructure) == 4 ) then { _index = 3 };
+	if ( (count _kzNameStructure) == 5 ) then { _index = 4 };
 	_itShouldBeNumeric = parseNumber (_kzNameStructure select _index);  // result will be a number extracted from string OR ZERO if inside the string has no numbers.
 	if ( _itShouldBeNumeric != 0 ) then { _isNumber = true } else { systemChat format ["%1 Marker '%2' > It has no a valid name. %3", _txtWarningHeader, _kz, _txtWarning_1] };
 	// Return:
@@ -259,9 +393,9 @@ THY_fnc_ETH_style = {
 	// check if the marker name has more than one _spacer character in its string composition:
 	_kzNameStructure = [_kz, _prefix, _spacer] call THY_fnc_ETH_marker_name_splitter;
 	// Check if the doctrine tag is correctly applied:
-	_kzDoctrine = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_session_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
+	_kzDoctrine = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
 	// Check if the faction tag is correctly applied:
-	_kzFaction = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_session_faction;  // if faction not valid, returns "", otherwise it returns the faction.
+	_kzFaction = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_section_faction;  // if faction not valid, returns "", otherwise it returns the faction.
 	// Declarations:
 	// private _colorToOthers = "ColorUNKNOWN";
 	_color = "ColorUNKNOWN";
@@ -311,7 +445,7 @@ THY_fnc_ETH_markers_visibility = {
 			_x setMarkerAlphaLocal 0;
 			// Kill zone stylish:
 			[ETH_debug, _x, _prefix, _spacer, _isVisible, _color, _brush] call THY_fnc_ETH_style;
-			// if the marker's name has the faction session in its name, do it:
+			// if the marker's name has the faction section in its name, do it:
 			if ( (count _kzNameStructure) == 4 ) then { _kzFaction = _kzNameStructure select 2 };
 			// if area marker owner matchs with the player faction, show locally the marker on the map:
 			if ( _isVisible ) then {
@@ -495,7 +629,7 @@ THY_fnc_ETH_inspection = {
 		};
 		// General land device rules > if device not deleted and topography rules true, and topography returned with at least one element in its array:
 		if ( !_wasDeviceDeleted AND ETH_globalRulesTopography AND ((count _noMineZonesTopography) > 0) ) then {
-			if ( ((_devicePos distance (_noMineZonesTopography select 0)) < 100) /*OR ((_devicePos distance (_noMineZonesTopography select 1)) < 100)*/ OR ((_devicePos distance (_noMineZonesTopography select 2)) < 100) ) then {
+			if ( ((_devicePos distance (_noMineZonesTopography select 0)) < 80) /*OR ((_devicePos distance (_noMineZonesTopography select 1)) < 100)*/ OR ((_devicePos distance (_noMineZonesTopography select 2)) < 80) ) then {
 				// Delete the device if some rule is broken, and report it:
 				deleteVehicle _device; _wasDeviceDeleted = true;
 			};

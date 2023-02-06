@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.3
+// ETHICS MINEFIELDS v1.7
 // File: your_mission\ETHICSMinefields\fn_ETH_functions.hpp
 // by thy (@aldolammel)
 

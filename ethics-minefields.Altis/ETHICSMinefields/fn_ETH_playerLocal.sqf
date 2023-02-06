@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5
+// ETHICS MINEFIELDS v1.7
 // File: your_mission\ETHICSMinefields\fn_ETH_playerLocal.sqf
 // by thy (@aldolammel)
 

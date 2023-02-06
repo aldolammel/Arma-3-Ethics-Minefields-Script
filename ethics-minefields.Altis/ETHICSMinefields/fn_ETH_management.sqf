@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.5.3
+// ETHICS MINEFIELDS v1.7
 // File: your_mission\ETHICSMinefields\fn_ETH_management.sqf
 // by thy (@aldolammel)
 
@@ -22,7 +22,7 @@ ETH_doctrinesOXU = true;                     // true = Unexploded bombs will spa
 	ETH_cosmeticSmokesUXO = true;      // true = adds few impact smoke sources into the UXO zones / false = turn it off. Default: true
 ETH_doctrinesTraps = true;            // true = Traps will spawn if an area-marker requests them / false = turn it off. Default: false
 	ETH_ammoTrapBT = "APERSTripMine";  // Default: "APERSTripMine". For more device options, check the Ethics Documentation.
-ETH_globalDevicesIntensity = "LOWEST";    // Proportional number of explosives through the area-markers. Options: "EXTREME", "HIGH", "MID", "LOW", "LOWEST". Default: "MID"
+ETH_globalDevicesIntensity = "MID";    // Proportional number of explosives through the area-markers. Options: "EXTREME", "HIGH", "MID", "LOW", "LOWEST". Default: "MID"
 ETH_globalRulesEthics = true;          // true = script follows military conventions for choosing where to plant mines / false = mine has no ethics. Default: true
 ETH_globalRulesTopography = true;      // true = script follows topography for choosing better where to plant mines / false = mines every terrains. Default: true
 ETH_A3_dynamicSim = true;              // true = devices that are too far away from players will be frozen to save server performance / false = turn it off. Default: true
@@ -53,7 +53,7 @@ publicVariable "ETH_debug"; publicVariable "ETH_killzoneVisibleOnMap"; publicVar
 	} else {
 		// Kill zone name's structure:
 		ETH_prefix = "killzone";  // CAUTION: NEVER include/insert the ETH_spacer character as part of the ETH_prefix too.
-		ETH_spacer = "_";  // CAUTION: try do not change it!
+		ETH_spacer = "_";  // CAUTION: try do not change it, and never use "%"!
 		publicVariable "ETH_prefix";
 		publicVariable "ETH_spacer";
 		// Initial values:            AP      AM      UXO     TP
