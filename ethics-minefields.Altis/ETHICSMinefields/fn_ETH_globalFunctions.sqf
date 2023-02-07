@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.7
+// ETHICS MINEFIELDS v1.7.1
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -104,7 +104,6 @@ THY_fnc_ETH_marker_scanner = {
 				// if the area-marker did'nt spawn, abort and delete the marker from _possibleKzMarkers:
 				if ( !_isKzPresent ) exitWith { 
 					if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The configured probability deleted the marker.", _txtDebugHeader, _x] };
-					_possibleKzMarkers deleteAt (_possibleKzMarkers find _x); 
 				};
 				// Check if the doctrine tag is correctly applied:
 				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
@@ -132,7 +131,6 @@ THY_fnc_ETH_marker_scanner = {
 				// if the area-marker did'nt spawn, abort and delete the marker from _possibleKzMarkers:
 				if ( !_isKzPresent ) exitWith { 
 					if ( ETH_debug ) then { systemChat format ["%1 Marker '%2' > The configured probability deleted the marker.", _txtDebugHeader, _x] };
-					_possibleKzMarkers deleteAt _x; 
 				};
 				// Check if the doctrine tag is correctly applied:
 				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
@@ -826,13 +824,15 @@ THY_fnc_ETH_execution_service = {
 				_device enableSimulation true;  // https://community.bistudio.com/wiki/enableSimulation
 			};
 		};
-		// If is NOT the Mission Editor debugging, and it's NOT a UXO device, the device will be revealed only for its faction:
-		if ( (!ETH_debug) AND (_kzDoctrine !="UXO") ) then {
-			// Case by case about the mine owners, do it:
-			switch ( _kzFaction ) do {
-				case "BLU": { blufor revealMine _device };
-				case "OPF": { opfor revealMine _device };
-				case "IND": { independent revealMine _device };
+		// If is NOT the Mission Editor debugging:
+		if ( !ETH_debug ) then {
+			// And it's NOT a UXO device, the device will be revealed only for its faction:
+			if ( _kzDoctrine !="UXO" ) then {
+				switch ( _kzFaction ) do {
+					case "BLU": { blufor revealMine _device };
+					case "OPF": { opfor revealMine _device };
+					case "IND": { independent revealMine _device };
+				};
 			};
 		// If is the mission editor debugging, all devices will be revealed, including UXO:
 		} else { (side player) revealMine _device };
