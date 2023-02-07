@@ -22,6 +22,7 @@ __
 - Anti-personnel (AP) landmines avoid roads and streets;
 - Anti-materiel (AM) landmines can be planted (ON/OFF) only on roads and streets;
 - Classic minefields can be also hybrid, bringing AP and AM mines features;
+- Customize each doctrines' explosive with devices from RHS, CUP or anyone mod;
 - Set (or not) for each kill zone has a faction owner;
 - Set (or not) for each kill zone a percentage of presence, controlling the kill zone spawn probability; 
 - Easy explosive devices amount management through the global intensity presets: lowest, low, mid, high, or extreme;
