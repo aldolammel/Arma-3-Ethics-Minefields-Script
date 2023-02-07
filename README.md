@@ -43,6 +43,7 @@ __
 **Feb, 7th 2023 | v1.7.1**
 
 - Fixed > missions with a lot of kill zones were not deleting their markers from the map correctly when the presence-probability needed to remove them; 
+- Fixed > UXO kill zones were visible out of debugging mode in those servers where revealed mines are visible through the map;
 
 **Feb, 6th 2023 | v1.7**
 
