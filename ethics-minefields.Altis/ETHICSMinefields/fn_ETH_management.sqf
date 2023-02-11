@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.7
+// ETHICS MINEFIELDS v1.8
 // File: your_mission\ETHICSMinefields\fn_ETH_management.sqf
 // by thy (@aldolammel)
 
@@ -13,14 +13,14 @@ ETH_killzoneVisibleOnMap = true;   // true = The faction kill zone is visible on
 	ETH_killzoneStyleBrush = "FDiagonal";  // texture of minefields on map in-game. Default: "FDiagonal"
 	ETH_killzoneStyleAlpha = 1;        // 0.5 = Minefields barely invisible on the map / 1 = quite visible. Default: 1
 ETH_doctrinesLandMinefield = true;     // true = landmines will spawn if an area-marker requests them / false = turn it off. Default: true
-	ETH_ammoLandAP = "APERSMine";    // Default: "APERSMine". For more device options, check the Ethics Documentation.
-	ETH_ammoLandAM = "ATMine";       // Default: "ATMine". For more device options, check the Ethics Documentation.
+	ETH_ammoLandAP = "APERSMine";      // Default: "APERSMine". For more device options, check the Ethics Documentation.
+	ETH_ammoLandAM = "ATMine";         // Default: "ATMine". For more device options, check the Ethics Documentation.
 ETH_doctrinesNavalMinefield = true;    // true = naval mines will spawn if an area-marker requests them / false = turn it off. Default: false
 	ETH_ammoNavalAM = "UnderwaterMineAB";  // Default: "UnderwaterMineAB". For more options, check the Ethics Documentation.
-ETH_doctrinesOXU = true;                     // true = Unexploded bombs will spawn if an area-marker requests them / false = turn it off. Default: false
+ETH_doctrinesOXU = true;                   // true = Unexploded bombs will spawn if an area-marker requests them / false = turn it off. Default: false
 	ETH_ammoPackUXO = ["BombCluster_01_UXO2_F", "BombCluster_02_UXO4_F", "BombCluster_03_UXO1_F"];  // For more device options, check the Ethics Documentation.
 	ETH_cosmeticSmokesUXO = true;      // true = adds few impact smoke sources into the UXO zones / false = turn it off. Default: true
-ETH_doctrinesTraps = true;            // true = Traps will spawn if an area-marker requests them / false = turn it off. Default: false
+ETH_doctrinesTraps = true;             // true = Traps will spawn if an area-marker requests them / false = turn it off. Default: false
 	ETH_ammoTrapBT = "APERSTripMine";  // Default: "APERSTripMine". For more device options, check the Ethics Documentation.
 ETH_globalDevicesIntensity = "MID";    // Proportional number of explosives through the area-markers. Options: "EXTREME", "HIGH", "MID", "LOW", "LOWEST". Default: "MID"
 ETH_globalRulesEthics = true;          // true = script follows military conventions for choosing where to plant mines / false = mine has no ethics. Default: true
@@ -30,7 +30,8 @@ ETH_A3_dynamicSim = true;              // true = devices that are too far away f
 
 
 // ETHICS CORE / TRY TO CHANGE NOTHING BELOW!!! --------------------------------------------------------------------
-publicVariable "ETH_debug"; publicVariable "ETH_killzoneVisibleOnMap"; publicVariable "ETH_killzoneStyleColor"; publicVariable "ETH_killzoneStyleBrush"; publicVariable "ETH_killzoneStyleAlpha"; publicVariable "ETH_doctrinesLandMinefield"; publicVariable "ETH_ammoLandAP"; publicVariable "ETH_ammoLandAM"; publicVariable "ETH_doctrinesNavalMinefield"; publicVariable "ETH_ammoNavalAM"; publicVariable "ETH_doctrinesOXU"; publicVariable "ETH_ammoPackUXO"; publicVariable "ETH_cosmeticSmokesUXO"; publicVariable "ETH_doctrinesTraps"; publicVariable "ETH_ammoTrapBT"; publicVariable "ETH_globalDevicesIntensity"; publicVariable "ETH_globalRulesEthics"; publicVariable "ETH_globalRulesTopography"; publicVariable "ETH_A3_dynamicSim"; /* publicVariable "ETH_minesEditableByZeus"; */
+publicVariable "ETH_debug"; publicVariable "ETH_killzoneVisibleOnMap"; publicVariable "ETH_killzoneStyleColor"; publicVariable "ETH_killzoneStyleBrush"; publicVariable "ETH_killzoneStyleAlpha"; publicVariable "ETH_doctrinesLandMinefield"; publicVariable "ETH_ammoLandAP"; publicVariable "ETH_ammoLandAM"; publicVariable "ETH_doctrinesNavalMinefield"; publicVariable "ETH_ammoNavalAM"; publicVariable "ETH_doctrinesOXU"; publicVariable "ETH_ammoPackUXO"; publicVariable "ETH_cosmeticSmokesUXO"; publicVariable "ETH_doctrinesTraps"; publicVariable "ETH_ammoTrapBT"; publicVariable "ETH_globalDevicesIntensity"; publicVariable "ETH_globalRulesEthics"; publicVariable "ETH_globalRulesTopography"; publicVariable "ETH_A3_dynamicSim"; /* publicVariable
+"ETH_minesEditableByZeus"; */
 
 [] spawn {
 	

@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.7.1
+// ETHICS MINEFIELDS v1.8
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -378,85 +378,6 @@ THY_fnc_ETH_marker_name_section_number = {
 	if ( _itShouldBeNumeric != 0 ) then { _isNumber = true } else { systemChat format ["%1 Marker '%2' > It has no a valid name. %3", _txtWarningHeader, _kz, _txtWarning_1] };
 	// Return:
 	_isNumber;
-};
-
-
-THY_fnc_ETH_style = {
-	// This function set the kill zone stylish on mission map via Local Player only.
-	// Returns Nothing.
-
-	params ["_debug",  "_kz", "_prefix", "_spacer", "_isVisible", "_color", "_brush"];
-	private ["_kzNameStructure", "_kzDoctrine", "_kzFaction"];
-
-	// check if the marker name has more than one _spacer character in its string composition:
-	_kzNameStructure = [_kz, _prefix, _spacer] call THY_fnc_ETH_marker_name_splitter;
-	// Check if the doctrine tag is correctly applied:
-	_kzDoctrine = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_section_doctrine;  // if doctrine not valid, returns "", otherwise it returns the doctrine.
-	// Check if the faction tag is correctly applied:
-	_kzFaction = [_kzNameStructure, _kz, false] call THY_fnc_ETH_marker_name_section_faction;  // if faction not valid, returns "", otherwise it returns the faction.
-	// Declarations:
-	// private _colorToOthers = "ColorUNKNOWN";
-	_color = "ColorUNKNOWN";
-	
-	// Case by case, check the valid marker name's amounts of strings:
-	switch ( count _kzNameStructure ) do {
-		// Case example: mf_ap_1
-		//case 3: {
-			// Mandatory to be this color:
-			//_color = _colorToOthers;
-		//};
-		// Case example: mf_ap_ind_2
-		case 4: {	
-			switch ( _kzFaction ) do {
-				case "BLU": { if ( (side player) == blufor ) then { _color = "colorRed" } };
-				case "OPF": { if ( (side player) == opfor ) then { _color = "colorRed" } };
-				case "IND": { if ( (side player) == independent ) then { _color = "colorRed" } };
-			};
-		};
-	};
-	// Finally, execute the style configuration:
-	if ( ETH_doctrinesLandMinefield AND (_kzDoctrine == "LAM") ) then { _brush = "Border" };  // style for doctrines where only roads are mined.
-	if ( ETH_doctrinesTraps AND (_kzDoctrine == "BT") ) then { _brush = "Border" };  // style for doctrines where only roads are mined.
-	if ( ETH_doctrinesOXU AND (_kzDoctrine == "UXO") ) then { _brush = "Cross" };
-	_kz setMarkerColorLocal _color;  // https://community.bistudio.com/wiki/Arma_3:_CfgMarkerColors
-	_kz setMarkerBrushLocal _brush;  // https://community.bistudio.com/wiki/setMarkerBrush
-	// Return:
-	true;
-};
-
-
-THY_fnc_ETH_markers_visibility = {
-	// This function controls locally if the specific player might see their kill zones' faction on the map.
-	// Returns nothing.
-
-	params ["_confirmedKzMarkers", "_prefix", "_spacer", "_isVisible", "_color", "_brush", "_alpha"];
-	private ["_eachConfirmedList", "_kzFaction", "_kzNameStructure"];
-
-	{  // forEach _confirmedKzMarkers:
-		_eachConfirmedList = _x;
-		{  // forEach _eachConfirmedList:
-			// Initial values:
-			_kzFaction = "";
-			// Looking for factions tag on kill zone names:
-			_kzNameStructure = [_x, _prefix, _spacer] call THY_fnc_ETH_marker_name_splitter;
-			// At first, hide all kill zones for this player:
-			_x setMarkerAlphaLocal 0;
-			// Kill zone stylish:
-			[ETH_debug, _x, _prefix, _spacer, _isVisible, _color, _brush] call THY_fnc_ETH_style;
-			// if the marker's name has the faction section in its name, do it:
-			if ( (count _kzNameStructure) == 4 ) then { _kzFaction = _kzNameStructure select 2 };
-			// if area marker owner matchs with the player faction, show locally the marker on the map:
-			if ( _isVisible ) then {
-				if ( (_kzFaction == "BLU") AND ((side player) == blufor) ) then { _x setMarkerAlphaLocal _alpha };
-				if ( (_kzFaction == "OPF") AND ((side player) == opfor) ) then { _x setMarkerAlphaLocal _alpha };
-				if ( (_kzFaction == "IND") AND ((side player) == independent) ) then { _x setMarkerAlphaLocal _alpha };
-			};
-			// If is the mission editor debugging, just show too:
-			if ( ETH_debug ) then { _x setMarkerAlphaLocal 1 };
-		} forEach _eachConfirmedList;
-	} forEach _confirmedKzMarkers;
-	// Returns:
-	true;
 };
 
 
