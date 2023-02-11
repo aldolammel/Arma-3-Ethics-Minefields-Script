@@ -13,6 +13,7 @@ __
 
 ## SCRIPT DETAILS
 
+- No dependencies from other mods or scripts;
 - Drag and drop a marker on Eden to create a full and unique kill zone such as minefields;
 - Also easy to build naval minefields, Unexploded ordnance zones (UXO), and Trap zones;
 - Ethics control (ON/OFF) to avoid planting explosive devices through civilian areas;
