@@ -38,12 +38,41 @@ THY_fnc_ETH_marker_name_splitter = {
 };
 
 
+THY_fnc_ETH_marker_checker = {
+	// This function checks if the marker is inside map borders.
+	// Return _isValidMarker: bool.
+
+	params ["_marker"];
+	private ["_txtWarningHeader", "_isValidMarker", "_markerPos", "_markerPosA", "_markerPosB"];
+
+	// Debug txts:
+	_txtWarningHeader = "ETHICS WARNING >";
+	// Initial values:
+	_isValidMarker = false;
+	// Checking the marker position:
+	_markerPos = getMarkerPos _marker;
+	_markerPosA = _markerPos select 0;
+	_markerPosB = _markerPos select 1;
+	// If marker is inside the map:
+	if ( (_markerPosA >= 0) AND (_markerPosB >= 0) AND (_markerPosA <= worldSize) AND (_markerPosB <= worldSize) ) then {
+		// Update to return:
+		_isValidMarker = true;
+	// Otherwise, if not on map area:
+	} else {
+		// Warning message:
+		systemChat format ["%1 Marker '%2' > This is in an invalid position and will be ignored until its position is within the map borders.", _txtWarningHeader, _marker];
+	};
+	// Return:
+	_isValidMarker;
+};
+
+
 THY_fnc_ETH_marker_scanner = {
 	// This function searches and appends in a list all area-markers confirmed as a real kill zone. The searching take place once right at the mission begins.
 	// Return: _confirmedKzMarkers: array [[area markers of factions], [area markers of unknown owner], [area markers of UXO]]
 
 	params ["_prefix", "_spacer"];
-	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_0", "_txtWarning_1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzFactionMarkers", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzFaction", "_isKzPresent", "_isNumber"];
+	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_0", "_txtWarning_1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzFactionMarkers", "_isValidMarker", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzFaction", "_isKzPresent", "_isNumber"];
 
 	// Declarations:
 	_realPrefix = _prefix + _spacer;
@@ -57,28 +86,24 @@ THY_fnc_ETH_marker_scanner = {
 	_confirmedKzMarkers = [];
 	_confirmedKzUnknownMarkers = [];
 	_confirmedKzFactionMarkers = [];
+	_isValidMarker = false;
+
 	// Step 1/2 > Creating a list with only area markers with right prefix:
-	if ( !ETH_debug ) then {
-		// Smarter and faster solution, searching and creating the list:
-		_possibleKzMarkers = allMapMarkers select { (_x find _realPrefix == 0) AND {(markerShape _x) in _acceptableShapes} };
-		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_0, _txtWarning_1] };
-	// As the slower solution, for debugging purporses:
-	} else {
-		 // Selecting the relevant markers in a slightly different way. Now searching for all marker shapes:
-		_possibleKzMarkers = allMapMarkers select { _x find _realPrefix == 0 };
-		if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_0, _txtWarning_1] };
-		{ // forEach _possibleKzMarkers:
-			// if the marker has no the shapes acceptables, do it:
-			if ( !((markerShape _x) in _acceptableShapes) ) then {
-				// delete the marker from the list:
-				_possibleKzMarkers deleteAt (_possibleKzMarkers find _x);
-				// delete the marker from the map:
-				//deleteMarker _x;
-				// Debug message:
-				systemChat format ["%1 Marker '%2' > This kill zone has NO a rectangle or ellipse shape to be considered to be populated with explosive devices.", _txtDebugHeader, _x];
-			};
-		} forEach _possibleKzMarkers;
-	};
+	// Selecting the relevant markers in a slightly different way. Now searching for all marker shapes:
+	_possibleKzMarkers = allMapMarkers select { _x find _realPrefix == 0 };
+	// Validating each marker position and shape:
+	{  // forEach _possibleKzMarkers:
+		_isValidMarker = [_x] call THY_fnc_ETH_marker_checker;
+		// If something wrong, remove the marker from the list and from the map:
+		if ( !_isValidMarker OR !((markerShape _x) in _acceptableShapes) ) then {
+			if ( !((markerShape _x) in _acceptableShapes) ) then { systemChat format ["%1 Marker '%2' > This kill zone has NO a rectangle or ellipse shape to be considered to be populated with explosive devices.", _txtWarningHeader, _x] };
+			deleteMarker _x;
+			_possibleKzMarkers deleteAt (_possibleKzMarkers find _x);
+		};
+	} forEach _possibleKzMarkers;
+	// Error handling:
+	if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", _txtWarningHeader, _txtWarning_0, _txtWarning_1] };
+
 	// Step 2/2 > Ignoring from the first list those area-markers that don't fit the name's structure rules, and creating new lists:
 	{  // forEach _possibleKzMarkers:
 		// check if the marker name has more than one _spacer character in its string composition:
