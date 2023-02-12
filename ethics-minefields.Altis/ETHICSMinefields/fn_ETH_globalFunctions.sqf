@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.8
+// ETHICS MINEFIELDS v1.9
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // by thy (@aldolammel)
 
@@ -39,8 +39,8 @@ THY_fnc_ETH_marker_name_splitter = {
 
 
 THY_fnc_ETH_marker_scanner = {
-	// This function search and append in a list all area-markers confirmed as a real kill zone. The searching take place once right at the mission begins.
-	// Returns _confirmedKzMarkers: array [[area markers of factions], [area markers of unknown owner], [area markers of UXO]]
+	// This function searches and appends in a list all area-markers confirmed as a real kill zone. The searching take place once right at the mission begins.
+	// Return: _confirmedKzMarkers: array [[area markers of factions], [area markers of unknown owner], [area markers of UXO]]
 
 	params ["_prefix", "_spacer"];
 	private ["_realPrefix", "_acceptableShapes", "_txtDebugHeader", "_txtWarningHeader", "_txtWarning_0", "_txtWarning_1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzFactionMarkers", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzFaction", "_isKzPresent", "_isNumber"];
@@ -88,7 +88,7 @@ THY_fnc_ETH_marker_scanner = {
 			// Case example: killzone_ap_1
 			case 3: {
 				// Check if the doctrine tag is correctly applied:
-				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;  // So far, I'm NOT using this _kzDoctrine return 'cause I'm handling the error within.
+				_kzDoctrine = [_kzNameStructure, _x, true] call THY_fnc_ETH_marker_name_section_doctrine;
 				// Check if the last section of the area marker name is numeric:
 				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
@@ -117,11 +117,11 @@ THY_fnc_ETH_marker_scanner = {
 					_confirmedKzFactionMarkers append [_x];
 				// Otherwise:
 				} else {
-					// if UXO doctrine or has no faction:
-					if ( (_kzDoctrine == "UXO") OR (_kzFaction == "") ) then {
-						// add this kill zone in the right array:
-						_confirmedKzUnknownMarkers append [_x];
-					};
+					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
+					if ( ETH_doctrinesLandMinefield AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesNavalMinefield AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesTraps AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesOXU AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
 				};
 			};
 			// Case example: killzone_ap_ind_75%_1
@@ -144,11 +144,11 @@ THY_fnc_ETH_marker_scanner = {
 					_confirmedKzFactionMarkers append [_x];
 				// Otherwise:
 				} else {
-					// if UXO doctrine or has no faction:
-					if ( (_kzDoctrine == "UXO") OR (_kzFaction == "") ) then {
-						// add this kill zone in the right array:
-						_confirmedKzUnknownMarkers append [_x];
-					};
+					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
+					if ( ETH_doctrinesLandMinefield AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesNavalMinefield AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesTraps AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesOXU AND (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
 				};
 			};
 		};
@@ -199,7 +199,7 @@ THY_fnc_ETH_available_doctrines = {
 
 
 THY_fnc_ETH_marker_name_section_doctrine = {
-	// This function checks the second section (mandatory) of the area marker's name, validating if the section is a valid ammunition doctrine.
+	// This function checks the second section (mandatory) of the area marker's name, validating if the section is a valid ammunition doctrine and if its doctrine is ON in management file.
 	// Returns _kzDoctrine: when valid, doctrine tag as string. When invalid, an empty string ("").
 
 	params ["_kzNameStructure", "_kz", "_isServerRequest"];
