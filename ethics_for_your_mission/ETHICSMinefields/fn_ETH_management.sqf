@@ -1,6 +1,6 @@
 // ETHICS MINEFIELDS v1.9
 // File: your_mission\ETHICSMinefields\fn_ETH_management.sqf
-// Documentation: soon.
+// Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 // by thy (@aldolammel)
 
 // Runs only in server:

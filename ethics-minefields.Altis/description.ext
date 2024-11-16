@@ -34,14 +34,9 @@ wreckRemovalMaxTime 	= 3600;
 // CBA MOD
 cba_settings_hasSettingsFile = 0;
 
-
-
-// - - - - - - - - - EVERYTHING ABOVE IS NOT NEEDED FOR THIS SCRIPT WORKS - - - - - - - - -
-// - - - - - - - - - - - TAKE ONLY THESE LINES BELOW FOR YOUR MISSION - - - - - - - - - - -
-
-
 class cfgFunctions 
 {
 	// ETHICS MINEFIELDS:
+	// Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 	#include "ETHICSMinefields\THY_ETH_functions.hpp"
 };
