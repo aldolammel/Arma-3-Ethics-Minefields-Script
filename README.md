@@ -1,4 +1,4 @@
-# Arma 3 / ETHICS Minefields v1.9 (WIP)
+# Arma 3 / ETHICS Minefields v1.9
 >*Dependencies: none.*
 
 ETHICS  is a full solution script for ARMA 3 that provides wide creation and management over statics kill zones like minefields, UXO zones, and trap zones. Built for single-player and multiplayer, ETHICS include kill zone doctrines such as land anti-personnel, land anti-materiel, naval anti-materiel, unexploded ordnance, and booby-trap.
@@ -42,10 +42,12 @@ __
 
 ## CHANGELONG
 
-**Feb, 12th 2023 | v1.9 WIP**
-
-- Fixed > Some kill zone doctrines got colors even when desactivated;
-- WIP: UXO smokes are not be shown in Dedicated servers;
+**Nov, 16th 2024 | v1.9**
+- Fixed known issue: UXO smokes were not be shown in Dedicated servers;
+- Improved the debug minefields colors based on minefields side;
+- Improved the script snippet from initPlayerLocal.sqf file;
+- New folder structure to make the installation easier;
+- Documentation has been updated (Nov, 17th);
 
 **Feb, 11th 2023 | v1.8**
 

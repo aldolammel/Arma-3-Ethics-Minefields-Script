@@ -16,7 +16,7 @@ class EditorData
 	};
 	class LayerIndexProvider
 	{
-		nextID=13;
+		nextID=14;
 	};
 	class Camera
 	{
@@ -173,7 +173,7 @@ class Mission
 							};
 							id=19;
 							type="O_soldier_exp_F";
-							atlOffset=1.9073486e-006;
+							atlOffset=1.9073486e-06;
 							class CustomAttributes
 							{
 								class Attribute0
@@ -331,7 +331,7 @@ class Mission
 							};
 							id=12;
 							type="B_soldier_AR_F";
-							atlOffset=-1.9073486e-006;
+							atlOffset=-1.9073486e-06;
 						};
 					};
 					class Attributes
@@ -640,16 +640,6 @@ class Mission
 		class Item3
 		{
 			dataType="Marker";
-			position[]={4598.084,0,23723.807};
-			name="marker-script-version";
-			text="    VERSION FEB, 5th 2023";
-			type="mil_box";
-			id=23;
-			atlOffset=165.30959;
-		};
-		class Item4
-		{
-			dataType="Marker";
 			position[]={14626.454,20.396,22961.658};
 			name="killzone_NAM_ind_1";
 			markerType="ELLIPSE";
@@ -659,19 +649,20 @@ class Mission
 			id=25;
 			atlOffset=9.8608418;
 		};
-		class Item5
+		class Item4
 		{
 			dataType="Marker";
 			position[]={9537.5947,-4.572,21897.566};
 			name="killzone_AP_opf_1";
 			markerType="ELLIPSE";
 			type="";
+			colorName="ColorBlack";
 			a=1086.663;
 			b=1086.663;
 			id=26;
 			atlOffset=-23.952337;
 		};
-		class Item6
+		class Item5
 		{
 			dataType="Marker";
 			position[]={7482.3491,151.771,17504.145};
@@ -683,19 +674,19 @@ class Mission
 			id=27;
 			atlOffset=-35.274979;
 		};
-		class Item7
+		class Item6
 		{
 			dataType="Marker";
-			position[]={16561.906,15.995,19902.799};
+			position[]={16325.12,15.995,19666.012};
 			name="killzone_UXO_1";
 			markerType="ELLIPSE";
 			type="";
-			a=704.54199;
-			b=704.54199;
+			a=941.32666;
+			b=941.32666;
 			id=29;
-			atlOffset=8.4867773;
+			atlOffset=-5.5675669;
 		};
-		class Item8
+		class Item7
 		{
 			dataType="Marker";
 			position[]={6145.9199,194.41901,20033.773};
@@ -707,7 +698,7 @@ class Mission
 			id=39;
 			atlOffset=-7.8578644;
 		};
-		class Item9
+		class Item8
 		{
 			dataType="Marker";
 			position[]={12193.592,41.480999,18802.389};
@@ -718,6 +709,16 @@ class Mission
 			b=812.151;
 			id=115;
 			atlOffset=-0.82223892;
+		};
+		class Item9
+		{
+			dataType="Marker";
+			position[]={4598.084,0,23723.807};
+			name="marker-script-version";
+			text="    VERSION NOV, 17TH 2024";
+			type="mil_box";
+			id=23;
+			atlOffset=165.30959;
 		};
 	};
 };
