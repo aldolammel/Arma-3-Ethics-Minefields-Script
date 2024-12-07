@@ -49,7 +49,7 @@ THY_fnc_ETH_marker_checker = {
 	// Initial values:
 	_isValidMarker = false;
 	// Checking the marker position:
-	_markerPos = getMarkerPos _marker;
+	_markerPos  = getMarkerPos _marker;
 	_markerPosA = _markerPos # 0;
 	_markerPosB = _markerPos # 1;
 	// If marker is inside the map:
@@ -71,35 +71,37 @@ THY_fnc_ETH_marker_scanner = {
 	// Return: _confirmedKzMarkers: array [[area markers of sides], [area markers of unknown owner], [area markers of UXO]]
 
 	params ["_prefix", "_spacer"];
-	private ["_realPrefix", "_acceptableShapes", "_txt0", "_txt1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzSideMkrs", "_isValidMarker", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzSide", "_isKzPresent", "_isNumber"];
+	private ["_acceptableShapes", "_txt0", "_txt1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzSideMkrs", "_isValidMarker", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzSide", "_isKzPresent", "_isNumber"];
 
 	// Declarations:
-	_realPrefix = _prefix + _spacer;
 	_acceptableShapes = ["RECTANGLE", "ELLIPSE"];
 	// Debug txts:
 	_txt0 = "This mission still has no possible kill zone(s) to be loaded.";
 	_txt1 = format ["If the intension is to make it a kill zone, its structure name must be '%1%2TagDoctrine%2TagSide%2anynumber' or '%1%2TagDoctrine%2anynumber'.", _prefix, _spacer];
 	// Initial values:
-	_confirmedKzMarkers = [];
+	_confirmedKzMarkers        = [];
 	_confirmedKzUnknownMarkers = [];
-	_confirmedKzSideMkrs = [];
-	_isValidMarker = false;
+	_confirmedKzSideMkrs       = [];
+	_isValidMarker             = false;
 
 	// Step 1/2 > Creating a list with only area markers with right prefix:
 	// Selecting the relevant markers in a slightly different way. Now searching for all marker shapes:
-	_possibleKzMarkers = allMapMarkers select { _x find _realPrefix == 0 };
+	_possibleKzMarkers = allMapMarkers select { _x find (_prefix + _spacer) isEqualTo 0 };
 	// Validating each marker position and shape:
 	{  // forEach _possibleKzMarkers:
 		_isValidMarker = [_x] call THY_fnc_ETH_marker_checker;
 		// If something wrong, remove the marker from the list and from the map:
 		if ( !_isValidMarker || !((markerShape _x) in _acceptableShapes) ) then {
-			if ( !((markerShape _x) in _acceptableShapes) ) then { systemChat format ["%1 Marker '%2' > This kill zone has NO a rectangle or ellipse shape to be considered to be populated with explosive devices.", ETH_txtWarnHeader, _x] };
+			if ( !((markerShape _x) in _acceptableShapes) ) then {
+				systemChat format ["%1 Marker '%2' > This kill zone has NO a rectangle or ellipse shape to be considered to be populated with explosive devices.",
+				ETH_txtWarnHeader, _x];
+			};
 			deleteMarker _x;
 			_possibleKzMarkers deleteAt (_possibleKzMarkers find _x);
 		};
 	} forEach _possibleKzMarkers;
 	// Error handling:
-	if ( (count _possibleKzMarkers) == 0 ) exitWith { systemChat format ["%1 %2 %3", ETH_txtWarnHeader, _txt0, _txt1] };
+	if ( count _possibleKzMarkers isEqualTo 0 ) exitWith { systemChat format ["%1 %2 %3", ETH_txtWarnHeader, _txt0, _txt1] };
 
 	// Step 2/2 > Ignoring from the first list those area-markers that don't fit the name's structure rules, and creating new lists:
 	{  // forEach _possibleKzMarkers:
@@ -114,7 +116,7 @@ THY_fnc_ETH_marker_scanner = {
 				// Check if the last section of the area marker name is numeric:
 				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
-				if ( (_kzDoctrine != "") && _isNumber ) then {
+				if ( (_kzDoctrine isNotEqualTo "") && _isNumber ) then {
 					// If is a non-side kill zone marker:
 					_confirmedKzUnknownMarkers append [_x];
 				};
@@ -134,16 +136,16 @@ THY_fnc_ETH_marker_scanner = {
 				// Check if the last section of the area-marker name is numeric:
 				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
-				if ( (_kzDoctrine != "") && (_kzDoctrine != "UXO") && (_kzSide != "") && _isNumber ) then {
+				if ( (_kzDoctrine isNotEqualTo "") && (_kzDoctrine isNotEqualTo "UXO") && (_kzSide isNotEqualTo "") && _isNumber ) then {
 					// add this kill zone in the right array:
 					_confirmedKzSideMkrs append [_x];
 				// Otherwise:
 				} else {
 					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
-					if ( ETH_doctrinesLandMinefield && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesTraps && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesOXU && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
 				};
 			};
 			// Case example: killzone_ap_ind_75%_1
@@ -161,16 +163,16 @@ THY_fnc_ETH_marker_scanner = {
 				// Check if the last section of the area-marker name is numeric:
 				_isNumber = [_kzNameStructure, _x, _prefix, _spacer] call THY_fnc_ETH_marker_name_section_number;
 				// If all validations alright:
-				if ( (_kzDoctrine != "") && (_kzDoctrine != "UXO") && (_kzSide != "") && _isNumber ) then {
+				if ( (_kzDoctrine isNotEqualTo "") && (_kzDoctrine isNotEqualTo "UXO") && (_kzSide isNotEqualTo "") && _isNumber ) then {
 					// add this kill zone in the right array:
 					_confirmedKzSideMkrs append [_x];
 				// Otherwise:
 				} else {
 					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
-					if ( ETH_doctrinesLandMinefield && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesTraps && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesOXU && (_kzDoctrine != "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
 				};
 			};
 		};
@@ -236,7 +238,8 @@ THY_fnc_ETH_marker_name_section_doctrine = {
 		_kz setMarkerAlpha 0;
 		// When feedback off, the message doesnt duplicate for mission editor (because the function also is called by fn_ETH_playerLocal.sqf and not only in server side):
 		if ( ETH_isOnDebug && _isServerRequest ) then {
-			systemChat format ["%1 Marker '%2' > The doctrine tag looks wrong or not available. There's no any '%3' doctrine available. Fix the marker variable name or check which doctrines are 'TRUE' in 'fn_ETH_management.sqf' file.", ETH_txtWarnHeader, _kz, _kzDoctrine];
+			systemChat format ["%1 Marker '%2' > The doctrine tag looks wrong or not available. There's no any '%3' doctrine available. Fix the marker variable name or check which doctrines are 'TRUE' in 'fn_ETH_management.sqf' file.",
+			ETH_txtWarnHeader, _kz, _kzDoctrine];
 		};
 		_kzDoctrine = "";
 	}; 
@@ -265,7 +268,7 @@ THY_fnc_ETH_presence_percentage_checker = {
 		// So delete it from the list to isolated that supposed to be just numbers:
 		_sectionChecker deleteAt (_sectionChecker find "%");
 		// If has no numbers in presence section, warning the editor:
-		if ( (count _sectionChecker) == 0 ) then {
+		if ( count _sectionChecker isEqualTo 0 ) then {
 			systemChat format ["%1 %2", ETH_txtWarnHeader, _txt6];
 		// Otherwise, check the numbers:
 		} else {
@@ -274,7 +277,7 @@ THY_fnc_ETH_presence_percentage_checker = {
 			// Converting from string to integer:
 			_itShouldBeNumeric = parseNumber _stringNumbersMerged;  // result will be a number extracted from string OR ZERO if inside the string has no numbers.
 			// if the conversion works:
-			if ( _itShouldBeNumeric != 0 ) then {
+			if ( _itShouldBeNumeric isNotEqualTo 0 ) then {
 				// if the number is between 0 and 100, keep going:
 				if ( _itShouldBeNumeric >= 1 && _itShouldBeNumeric <= 100 ) then {
 					// Convert a possible float number to integer:
@@ -300,11 +303,11 @@ THY_fnc_ETH_marker_name_section_presence = {
 	// Debug txts:
 	// Initial values:
 	_isKzPresent = true;
-	_kzPresence = "";
+	_kzPresence  = "";
 	// Declarations:
 	_sectionsAvailable = count (_kzNameStructure);
 
-	switch ( _sectionsAvailable ) do {
+	switch _sectionsAvailable do {
 		// Example: killzone_AP_75%_1
 		case 4: {
 			_kzPresence = _kzNameStructure # 2;
@@ -317,7 +320,7 @@ THY_fnc_ETH_marker_name_section_presence = {
 		};
 	};
 	// Calculationg the probability of the kill zone to be present in-game:
-	if ( _realPercentage < (random 100) ) then {
+	if ( _realPercentage < random 100 ) then {
 		// delete the marker (only for security):
 		deleteMarker _kz;
 		// Update to return:
@@ -339,7 +342,7 @@ THY_fnc_ETH_marker_name_section_side = {
 
 	// Declarations:
 	_kzDoctrine = _kzNameStructure # 1;
-	_kzSide  = _kzNameStructure # 2;
+	_kzSide     = _kzNameStructure # 2;
 	// Handling errors > if Presence section, abort the function:
 	_thirdSectionChecker = _kzSide splitString "";
 	if ( "%" in _thirdSectionChecker ) exitWith {
@@ -349,7 +352,7 @@ THY_fnc_ETH_marker_name_section_side = {
 		_kzSide;
 	};
 	// Handling errors > if UXO doctrine, abort the function:
-	if ( _kzDoctrine == "UXO" ) exitWith {
+	if ( _kzDoctrine isEqualTo "UXO" ) exitWith {
 		// When feedback off, the message doesnt duplicate for mission editor (because the function also is called by LocalPlayer and not only in server side):
 		if _isServerRequest then {
 			systemChat format ["%1 Marker '%2' > %3 doctrine has its zones always unknown, so you CANNOT use a side tag ('%4'). For logic reasons, the script is ignoring the side tag.", ETH_txtWarnHeader, _kz, _kzDoctrine, _kzSide];
@@ -386,11 +389,11 @@ THY_fnc_ETH_marker_name_section_number = {
 	_isNumber = false;
 	_index = nil;
 	// Number validation:
-	if ( (count _kzNameStructure) == 3 ) then { _index = 2 };  // it's needed because marker names can have 3, 4 or 5 sections, depends if the Faction tag is been used and Presence tag.
-	if ( (count _kzNameStructure) == 4 ) then { _index = 3 };
-	if ( (count _kzNameStructure) == 5 ) then { _index = 4 };
+	if ( count _kzNameStructure isEqualTo 3 ) then { _index = 2 };  // it's needed because marker names can have 3, 4 or 5 sections, depends if the Faction tag is been used and Presence tag.
+	if ( count _kzNameStructure isEqualTo 4 ) then { _index = 3 };
+	if ( count _kzNameStructure isEqualTo 5 ) then { _index = 4 };
 	_itShouldBeNumeric = parseNumber (_kzNameStructure select _index);  // result will be a number extracted from string OR ZERO if inside the string has no numbers.
-	if ( _itShouldBeNumeric != 0 ) then { _isNumber = true } else { systemChat format ["%1 Marker '%2' > It has no a valid name. %3", ETH_txtWarnHeader, _kz, _txt1] };
+	if ( _itShouldBeNumeric isNotEqualTo 0 ) then { _isNumber = true } else { systemChat format ["%1 Marker '%2' > It has no a valid name. %3", ETH_txtWarnHeader, _kz, _txt1] };
 	// Return:
 	_isNumber;
 };
@@ -408,14 +411,14 @@ THY_fnc_ETH_shape_symmetry = {
 	_kzNameStructure = [_kz, _prefix, _spacer] call THY_fnc_ETH_marker_name_splitter;
 	// Declarations:
 	_kzDoctrine = _kzNameStructure # 1;
-	_radiusMin = 25;
-	_radiusMax = 2500;
-	if ( _kzDoctrine == "BT" ) then { _radiusMax = 500 };  // CAUTION: BT doctrine uses nearestObject searching in this area, so that demands too much of server CPU.
+	_radiusMin  = 25;
+	_radiusMax  = 2500;
+	if ( _kzDoctrine isEqualTo "BT" ) then { _radiusMax = 500 };  // CAUTION: BT doctrine uses nearestObject searching in this area, so that demands too much of server CPU.
 	// Kill zone dimensions:
-	_kzWidth = (markerSize _kz) # 0;
+	_kzWidth  = (markerSize _kz) # 0;
 	_kzHeight = (markerSize _kz) # 1;
 	// If the kill zone marker shape is not symmetric, do it:
-	if ( _kzWidth != _kzHeight ) then {
+	if ( _kzWidth isNotEqualTo _kzHeight ) then {
 		// Make the kill zone symmetric:
 		_kz setMarkerSize [_kzWidth, _kzWidth];
 		// Alert the mission editor:
@@ -500,7 +503,7 @@ THY_fnc_ETH_no_mine_topography = {
 	// Initial values:
 	_noMineZonesTopography = [];
 	// Basic validation:
-	if ( (!ETH_globalRulesTopography) || (_kzDoctrine == "UXO") || (_kzDoctrine == "BT") || (_kzDoctrine == "LAM") || (_subdoctrine == "LAM") ) exitWith { _noMineZonesTopography /*Returning*/ };
+	if ( (!ETH_globalRulesTopography) || (_kzDoctrine isEqualTo "UXO") || (_kzDoctrine isEqualTo "BT") || (_kzDoctrine isEqualTo "LAM") || (_subdoctrine isEqualTo "LAM") ) exitWith { _noMineZonesTopography /*Returning*/ };
 	// Topography features:
 	_noMineZonesTopography = [
 		nearestLocation [_devicePos, "RockArea"],    // index 0
@@ -522,7 +525,7 @@ THY_fnc_ETH_no_mine_ethics = {
 	// Initial values:
 	_noMineZonesEthics = [];
 	// Basic validation:
-	if ( (!ETH_globalRulesEthics) || (_kzDoctrine == "UXO") ) exitWith { _noMineZonesEthics /*Returning*/ };
+	if ( !ETH_globalRulesEthics || _kzDoctrine isEqualTo "UXO" ) exitWith { _noMineZonesEthics /*Returning*/ };
 	// Civilian zones:
 	_noMineZonesEthics = [
 		nearestLocation [_devicePos, "NameVillage"],      // index 0
@@ -547,7 +550,7 @@ THY_fnc_ETH_inspection = {
 	_noMineZonesTopography = [];
 	_noMineZonesEthics     = [];
 	// If UXO, just get out:
-	if ( _kzDoctrine == "UXO" ) exitWith { _wasDeviceDeleted /*returning*/ };  // 'cause all UXO devices will be dropped, with no rules, even in water.
+	if ( _kzDoctrine isEqualTo "UXO" ) exitWith { _wasDeviceDeleted /*returning*/ };  // 'cause all UXO devices will be dropped, with no rules, even in water.
 	// Global Rules checker:
 	_noMineZonesTopography = [_kzDoctrine, _hybridSubdoctrine, _devicePos] call THY_fnc_ETH_no_mine_topography;
 	_noMineZonesEthics = [_kzDoctrine, _hybridSubdoctrine, _devicePos] call THY_fnc_ETH_no_mine_ethics;
@@ -575,17 +578,17 @@ THY_fnc_ETH_inspection = {
 		// If not deleted yet:
 		if !_wasDeviceDeleted then {
 			// AP land device rules only > if device not deleted and AP is on road:
-			if ( (_kzDoctrine == "AP") || (_hybridSubdoctrine == "AP") ) then {
+			if ( _kzDoctrine isEqualTo "AP" || _hybridSubdoctrine isEqualTo "AP" ) then {
 				// if AP over the roads, delete the device, and report it:
 				if ( isOnRoad _devicePos ) then { deleteVehicle _device; _wasDeviceDeleted = true };
 			};
 			// LAM land device rules only > if device not deleted and LAM is NOT on road:
-			if ( (_kzDoctrine == "LAM") || (_hybridSubdoctrine == "LAM") ) then {
+			if ( _kzDoctrine isEqualTo "LAM" || _hybridSubdoctrine isEqualTo "LAM" ) then {
 				// if LAM out of the roads, delete the device, and report it:
 				if ( !(isOnRoad _devicePos) ) then { deleteVehicle _device; _wasDeviceDeleted = true };
 			};
 			// BT land device rules only > if device not deleted and BT is on road:
-			if ( (_kzDoctrine == "BT") && (isOnRoad _devicePos) ) then {
+			if ( _kzDoctrine isEqualTo "BT" && isOnRoad _devicePos ) then {
 				// Delete the device if some rule is broken, and report it:
 				deleteVehicle _device; _wasDeviceDeleted = true;
 			};
@@ -688,16 +691,16 @@ THY_fnc_ETH_execution_service = {
 	sleep 0.05;  // CAUTION: without the breath, ETHICS might affect the server performance as hell.
 	// Debug txts:
 	// Handling errors:
-	if ( (_kzDoctrine == "HY") && (_hybridSubdoctrine == "") ) then { systemChat format ["%1 %2 > In this doctrine is mandatory to set '_hybridSubdoctrine' at 'THY_fnc_ETH_device_planter' when is called the 'THY_fnc_ETH_execution_service' function.) ", ETH_txtWarnHeader, _kzDoctrine] };
+	if ( _kzDoctrine isEqualTo "HY" && _hybridSubdoctrine isEqualTo "" ) then { systemChat format ["%1 %2 > In this doctrine is mandatory to set '_hybridSubdoctrine' at 'THY_fnc_ETH_device_planter' when is called the 'THY_fnc_ETH_execution_service' function.) ", ETH_txtWarnHeader, _kzDoctrine] };
 	// Initial values:
-	_device = objNull;
-	_place = [];
+	_device     = objNull;
+	_place      = [];
 	_placeIndex = nil;
-	_placePos = [];
-	_devicePos = [];
+	_placePos   = [];
+	_devicePos  = [];
 
 	// STEP 1 > WHEN SPECIFIC PLACE is needed:
-	if ( _kzDoctrine == "BT" ) then {
+	if ( _kzDoctrine isEqualTo "BT" ) then {
 		// if there's at least one place into the _whereToPlant, do it:
 		if ( (count _whereToPlant) > 0 ) then {
 			// select a place option from the list:
@@ -715,7 +718,7 @@ THY_fnc_ETH_execution_service = {
 	// Land doctrine:
 	if !_isNaval then {
 		// CREATING:
-		if ( _kzDoctrine !="BT" ) then {
+		if ( _kzDoctrine isNotEqualTo "BT" ) then {
 			_device = createMine [_ammoClassname, _kzPos, [], _kzRadius];
 		} else {
 			// Booby-trap device is created, forcing its Z axis position to avoid devices floating:
@@ -723,14 +726,14 @@ THY_fnc_ETH_execution_service = {
 		};
 		// GETTING POSITION releated by terrain level, including sea floor: https://community.bistudio.com/wiki/File:position.jpg
 		_devicePos = getPosATL _device;
-		if ( _kzDoctrine == "UXO" ) then {
+		if ( _kzDoctrine isEqualTo "UXO" ) then {
 			// Adds a cosmetic crater around the device:
 			[_devicePos] call THY_fnc_ETH_cosmetic_UXO_impact_fail;
 			// Force the Z axis to be ZERO 'cause Arma creates the device at the first surface found (sea surface) so this will put the device to the sea floor:
 			_device setPosATL [(_devicePos # 0), (_devicePos # 1), 0];  // [x, y, z] / best result here with Z=0
 		};
 		// SETTING DIRECTION:
-		if ( _kzDoctrine == "UXO" || _kzDoctrine == "BT" ) then {
+		if ( _kzDoctrine isEqualTo "UXO" || _kzDoctrine isEqualTo "BT" ) then {
 			// Randomizing the device direction:
 			_device setDir (selectRandom [0, 45, 90, 135, 180, 225, 270, 315]);  // compass degrees.
 		};		
@@ -760,7 +763,7 @@ THY_fnc_ETH_execution_service = {
 		// If is NOT the Mission Editor debugging:
 		if !ETH_isOnDebug then {
 			// And it's NOT a UXO device, the device will be revealed only for its side:
-			if ( _kzDoctrine !="UXO" ) then {
+			if ( _kzDoctrine isNotEqualTo"UXO" ) then {
 				switch ( _kzSide ) do {
 					case "BLU": { BLUFOR revealMine _device };
 					case "OPF": { OPFOR revealMine _device };
@@ -789,7 +792,7 @@ THY_fnc_ETH_device_planter = {
 	// Config from Kill zone Name Structure:
 	_kzDoctrine = _kzNameStructure # 1;
 	_kzSide  = "";
-	if ( (count _kzNameStructure) == 4 ) then { _kzSide = _kzNameStructure # 2 };
+	if ( count _kzNameStructure isEqualTo 4 ) then { _kzSide = _kzNameStructure # 2 };
 	// Kill zone attributes: 
 	_kzPos    = markerPos _kz;    // [5800.70,3000.60,0]
 	_kzRadius = _kzSize # 0;      // 40.1234
@@ -1043,11 +1046,11 @@ THY_fnc_ETH_done_feedbacks = {
 	_txt4 = format ["Too much devices deleted (%1 of %2) for simulation reasons or editor's choices. %3", _devicesDeleted, _devicesPlanted, _txt2];
 	_txt5 = format ["No mines were planted. Try to restart the mission to make sure it was just a coincidence. If the behavior comes again, try to change the kill zone position or increase the mines' intensity (current='%1').", ETH_globalDevicesIntensity];
 	// If doctrine has NO subdoctrine:
-	if ( _hybridTitle == "" ) then {
+	if ( _hybridTitle isEqualTo "" ) then {
 		// Debug Kill zone feedbacks > Everything looks fine:
 		if ( ETH_isOnDebug && (_devicesDeleted < _limiterMinesDeleted) ) then { 
 			// If no mines deleted:
-			if ( _devicesDeleted == 0 ) then {
+			if ( _devicesDeleted isEqualTo 0 ) then {
 				systemChat format ["%1 Marker '%2' > %3 > Got all %4 devices planted successfully.", ETH_txtDebugHeader, _kz, _kzDoctrine, _devicesPlanted];
 			// Otherwise, just a few mines deleted:
 			} else {
@@ -1058,13 +1061,13 @@ THY_fnc_ETH_done_feedbacks = {
 			// If lots of mines deleted:
 			if ( _devicesDeleted > _limiterMinesDeleted ) then {
 				// If it's NOT LAM:
-				if ( _kzDoctrine != "LAM" ) then {
+				if ( _kzDoctrine isNotEqualTo "LAM" ) then {
 					// Warning message:
 					systemChat format ["%1 Marker '%2' > %3 > %4", ETH_txtWarnHeader, _kz, _kzDoctrine, _txt4];
 				// if it's LAM:
 				} else {
 					// just show the regular debug message for LAM if, at least, one LAM was planted:
-					if ( ETH_isOnDebug && ((_devicesPlanted - _devicesDeleted) != 0) ) then { 
+					if ( ETH_isOnDebug && ((_devicesPlanted - _devicesDeleted) isNotEqualTo 0) ) then { 
 						systemChat format ["%1 Marker '%2' > %3 > From %4 devices planted, %5 were deleted (balance: %6).", ETH_txtDebugHeader, _kz, _kzDoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)];
 					// Otherwise, you finally got a rare scenario to check:
 					} else {
@@ -1078,7 +1081,7 @@ THY_fnc_ETH_done_feedbacks = {
 		// If everything looks fine:
 		if ( _devicesDeleted < _limiterMinesDeleted ) then { 
 			// If no mines deleted:
-			if ( _devicesDeleted == 0 ) then {
+			if ( _devicesDeleted isEqualTo 0 ) then {
 				if ETH_isOnDebug then { systemChat format ["%1 Marker '%2' > %3 > %4 > Got all %5 devices planted successfully.", ETH_txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted] };
 			// Otherwise, just a few mines deleted:
 			} else {
@@ -1087,13 +1090,13 @@ THY_fnc_ETH_done_feedbacks = {
 		// Otherwise, if the amount of devices-deleted is bigger than the limiter of devices-deleted:
 		} else {
 			// If it's NOT LAM:
-			if ( _subdoctrine != "LAM" ) then {
+			if ( _subdoctrine isNotEqualTo "LAM" ) then {
 				// Warming message:
 				systemChat format ["%1 Marker '%2' > %3 > %4 > %5", ETH_txtWarnHeader, _kz, _hybridTitle, _subdoctrine, _txt4];
 			// Otherwise, if it's LAN:
 			} else {
 				// just show the regular debug message for HY LAM if, at least, one LAM was planted:
-				if (  (_devicesPlanted - _devicesDeleted) != 0 ) then {
+				if (  (_devicesPlanted - _devicesDeleted) isNotEqualTo 0 ) then {
 					if ETH_isOnDebug then { systemChat format ["%1 Marker '%2' > %3 > %4 > From %5 devices planted, %6 were deleted (balance: %7).", ETH_txtDebugHeader, _kz, _hybridTitle, _subdoctrine, _devicesPlanted, _devicesDeleted, (_devicesPlanted - _devicesDeleted)] };
 				// Otherwise, you finally got a rare scenario to check:
 				} else {

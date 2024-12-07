@@ -22,9 +22,9 @@ if ( ETH_doctrinesLandMinefield || ETH_doctrinesNavalMinefield || ETH_doctrinesO
 			// Initial values:
 			_kzBrush = ETH_killzoneStyleBrush;  // Assuming all minefield areas, if it known, has the a pattern texture on the map.
 			// Execute the style configuration, regardless the player can see it or not:
-			if ( ETH_doctrinesLandMinefield && (_kzDoctrine == "LAM") ) then { _kzBrush = "Border" };  // style for doctrines where only roads are mined.
-			if ( ETH_doctrinesTraps && (_kzDoctrine == "BT") ) then          { _kzBrush = "Border" };  // style for doctrines where only roads are mined.
-			if ( ETH_doctrinesOXU && (_kzDoctrine == "UXO") ) then           { _kzBrush = "Cross" };   // https://community.bistudio.com/wiki/setMarkerBrush
+			if ( ETH_doctrinesLandMinefield && (_kzDoctrine isEqualTo "LAM") ) then { _kzBrush = "Border" };  // style for doctrines where only roads are mined.
+			if ( ETH_doctrinesTraps && (_kzDoctrine isEqualTo "BT") ) then          { _kzBrush = "Border" };  // style for doctrines where only roads are mined.
+			if ( ETH_doctrinesOXU && (_kzDoctrine isEqualTo "UXO") ) then           { _kzBrush = "Cross" };   // https://community.bistudio.com/wiki/setMarkerBrush
 			_x setMarkerBrushLocal _kzBrush;  // Be smart and leave all minefield areas with the correct brush.
 			if !ETH_isOnDebug then {
 				_x setMarkerAlphaLocal 0;  // if not debugging, assumes all minefield areas are unknown and should be hidden.
@@ -45,9 +45,9 @@ if ( ETH_doctrinesLandMinefield || ETH_doctrinesNavalMinefield || ETH_doctrinesO
 				// Each minefield planted by the player's side, make that area visible on the player's map:
 				switch _kzSide do {
 					// If debugging false, it makes sure the player can see their side minefield areas at least if the editor allows them (ETH_killzoneVisibleOnMap):
-					case "BLU": { if ( _playerSide == BLUFOR ) then      { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
-					case "OPF": { if ( _playerSide == OPFOR ) then       { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
-					case "IND": { if ( _playerSide == INDEPENDENT ) then { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
+					case "BLU": { if ( _playerSide isEqualTo BLUFOR ) then      { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
+					case "OPF": { if ( _playerSide isEqualTo OPFOR ) then       { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
+					case "IND": { if ( _playerSide isEqualTo INDEPENDENT ) then { _x setMarkerAlphaLocal ETH_killzoneStyleAlpha } };
 				};
 				if !ETH_isOnDebug then { _x setMarkerColorLocal ETH_killzoneStyleColor };
 			};
