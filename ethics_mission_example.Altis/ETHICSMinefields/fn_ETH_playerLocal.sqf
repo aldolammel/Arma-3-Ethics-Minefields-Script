@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.9
+// ETHICS MINEFIELDS v1.9.1
 // File: your_mission\ETHICSMinefields\fn_ETH_playerLocal.sqf
 // Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 // by thy (@aldolammel)
@@ -6,13 +6,14 @@
 
 // ETHICS CORE / TRY TO CHANGE NOTHING BELOW!!! --------------------------------------------------------------------
 // Escape:
-if ( !ETH_isOn || !hasInterface) exitWith {};  // all players clients and player host can read this file.
+if ( !ETH_isOn || !hasInterface ) exitWith {};  // all players clients and player host can read this file.
+
 // Check if the main script file is okay to keep going:
 if ( ETH_doctrinesLandMinefield || ETH_doctrinesNavalMinefield || ETH_doctrinesOXU || ETH_doctrinesTraps ) then {
 	// Local object declarations:
 	params ["_playerSide"];
 	private ["_eachConfirmedList", "_kzNameStructure", "_kzDoctrine", "_kzSide", "_kzBrush"];
-	{  // forEach ETH_confirmedKzMarkers:
+	{  // forEach ETH_confirmedKzMkrs:
 		_eachConfirmedList = _x;
 		{  // forEach _eachConfirmedList:
 			// Basic validations:
@@ -52,7 +53,7 @@ if ( ETH_doctrinesLandMinefield || ETH_doctrinesNavalMinefield || ETH_doctrinesO
 				if !ETH_isOnDebug then { _x setMarkerColorLocal ETH_killzoneStyleColor };
 			};
 		} forEach _eachConfirmedList;
-	} forEach ETH_confirmedKzMarkers;
+	} forEach ETH_confirmedKzMkrs;
 };
 // Return:
 true;

@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.9
+// ETHICS MINEFIELDS v1.9.1
 // File: your_mission\ETHICSMinefields\fn_ETH_management.sqf
 // Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 // by thy (@aldolammel)
@@ -7,14 +7,14 @@
 if !isServer exitWith {};
 
 // PARAMETERS OF EDITOR'S OPTIONS:
-ETH_isOn = true;                           // true = keep the script running in your mission / false = turn it completelly off. Default: true;
+ETH_isOn = true;                           // true = keep the script running in your mission / false = turn it completely off. Default: true;
 
 // Main:
     ETH_isOnDebug              = true;     // true = shows crucial info only to hosted-server-player / false = turn it off / Default: false;
     ETH_killzoneStyleColor     = "ColorRed";   // color of minefields on map in-game. Default: "ColorRed"  // https://community.bistudio.com/wiki/Arma_3:_CfgMarkerColors
     ETH_killzoneStyleBrush     = "FDiagonal";  // texture of minefields on map in-game. Default: "FDiagonal"
     ETH_killzoneStyleAlpha     = 1;       // 0.5 = Minefields barely invisible on the map / 1 = quite visible. Default: 1
-    ETH_killzoneVisibleOnMap   = true;    // true = The side kill zone is visible on map only by its side player / false = invisible for everyone. Defalt: true
+    ETH_killzoneVisibleOnMap   = true;    // true = The side kill zone is visible on map only by its side player / false = invisible for everyone. Default: true
     ETH_globalDevicesIntensity = "MID";   // Proportional number of explosives through the area-markers. Options: "EXTREME", "HIGH", "MID", "LOW", "LOWEST". Default: "MID"
     ETH_globalRulesEthics      = true;    // true = script follows military conventions for choosing where to plant mines / false = mine has no ethics. Default: true;
     ETH_globalRulesTopography  = true;    // true = script follows topography for choosing better where to plant mines / false = mines every terrains. Default: true;
@@ -51,7 +51,7 @@ ETH_isOn = true;                           // true = keep the script running in 
 // When the mission starts:
 [] spawn {
 	// Local object declarations:
-	private ["_txt3","_deviceAmountsByDoctrine","_confirmedKzMkrs","_kzAmountSide","_kzAmountUnknown","_eachConfirmedList","_kzSize","_limiterDevicesKz","_allDevicesPlantedAP","_allDevicesDeletedAP","_allDevicesPlantedAM","_allDevicesDeletedAM","_allDevicesPlantedUXO","_allDevicesDeletedUXO","_allDevicesPlantedTP","_allDevicesDeletedTP","_totalDevicesDeleted","_totalDevicesPlanted","_balanceDevicesAP","_balanceDevicesAM","_balanceDevicesUXO","_balanceDevicesTP","_balanceDevicesTotal","_balanceDevicesNoEthTotal"];
+	private ["_txt3","_deviceAmountsByDoctrine","_kzAmountSide","_kzAmountUnknown","_eachConfirmedList","_kzSize","_limiterDevicesKz","_allDevicesPlantedAP","_allDevicesDeletedAP","_allDevicesPlantedAM","_allDevicesDeletedAM","_allDevicesPlantedUXO","_allDevicesDeletedUXO","_allDevicesPlantedTP","_allDevicesDeletedTP","_totalDevicesDeleted","_totalDevicesPlanted","_balanceDevicesAP","_balanceDevicesAM","_balanceDevicesUXO","_balanceDevicesTP","_balanceDevicesTotal","_balanceDevicesNoEthTotal"];
 	
 	// Declarations:
 	ETH_txtDebugHeader = "ETHICS DEBUG >";
@@ -65,7 +65,7 @@ ETH_isOn = true;                           // true = keep the script running in 
 	if (ETH_doctrinesLandMinefield && ETH_ammoLandAP isEqualTo "") then { ETH_ammoLandAP = "APERSMine"; systemChat format ["%1 The AP %2", ETH_txtWarnHeader, _txt3]};
 	if (ETH_doctrinesLandMinefield && ETH_ammoLandAM isEqualTo "") then { ETH_ammoLandAM = "ATMine"; systemChat format ["%1 The AM %2", ETH_txtWarnHeader, _txt3]};
 	if (ETH_doctrinesNavalMinefield && ETH_ammoNavalAM isEqualTo "") then { ETH_ammoNavalAM = "UnderwaterMineAB"; systemChat format ["%1 The NAM %2", ETH_txtWarnHeader, _txt3]};
-	if (ETH_doctrinesOXU && (count ETH_ammoPackUXO) isEqualTo 0) then { ETH_ammoPackUXO = ["BombCluster_01_UXO2_F","BombCluster_02_UXO4_F","BombCluster_03_UXO1_F"]; systemChat format ["%1 The UXO %2", ETH_txtWarnHeader, _txt3]};
+	if (ETH_doctrinesOXU && ETH_ammoPackUXO isEqualTo []) then { ETH_ammoPackUXO = ["BombCluster_01_UXO2_F","BombCluster_02_UXO4_F","BombCluster_03_UXO1_F"]; systemChat format ["%1 The UXO %2", ETH_txtWarnHeader, _txt3]};
 	if (ETH_doctrinesTraps && ETH_ammoTrapBT isEqualTo "") then { ETH_ammoTrapBT = "APERSTripMine"; systemChat format ["%1 The BT %2", ETH_txtWarnHeader, _txt3]};
 	// Escape:
 	if ( ETH_isOn && !ETH_doctrinesLandMinefield && !ETH_doctrinesNavalMinefield && !ETH_doctrinesOXU && !ETH_doctrinesTraps) exitWith {publicVariable "ETH_isOn"; publicVariable "ETH_isOnDebug"; publicVariable "ETH_doctrinesLandMinefield"; publicVariable "ETH_doctrinesNavalMinefield"; publicVariable "ETH_doctrinesOXU"; publicVariable "ETH_doctrinesTraps"; systemChat format ["%1 There's no any doctrine available at fn_ETH_management.sqf file. Turn some doctrine 'TRUE' to use Ethics Minefields script. The script was turned off automatically!", ETH_txtWarnHeader]};
@@ -74,31 +74,31 @@ ETH_isOn = true;                           // true = keep the script running in 
 	ETH_spacer = "_";  // CAUTION: try do not change it, and never use "%"!
 	// Initial values:            AP     AM    UXO     TP
 	_deviceAmountsByDoctrine = [[0, 0],[0, 0],[0, 0],[0, 0]];  // [planted, deleted]
-	_confirmedKzMkrs         = [];
+	ETH_confirmedKzMkrs      = [];
 	_limiterDevicesKz        = [];
 	_kzNameStructure         = [];
 	_kzAmountSide            = 0;
 	_kzAmountUnknown         = 0;
 	// Search for all kill zone area-markers set by mission editor on Eden:
-	_confirmedKzMkrs = [ETH_prefix, ETH_spacer] call THY_fnc_ETH_marker_scanner;
+	ETH_confirmedKzMkrs = [ETH_prefix, ETH_spacer] call THY_fnc_ETH_marker_scanner;
 
 	// IT HAPPENS BEFORE THE BRIEFING SCREEN:
 	// Converting specific area markers to kill zone:
-	{  // forEach _confirmedKzMkrs (part 1/2):
+	{  // forEach ETH_confirmedKzMkrs (part 1/2):
 		_eachConfirmedList = _x;
 		{  // forEach _eachConfirmedList:
 			// Marker shape symmetry's consolidation:
 			[_x, ETH_prefix, ETH_spacer] call THY_fnc_ETH_shape_symmetry;
 		} forEach _eachConfirmedList;
-	} forEach _confirmedKzMkrs;
+	} forEach ETH_confirmedKzMkrs;
 	// Broadcasting the public variables:
-	publicVariable "ETH_isOn"; publicVariable "ETH_isOnDebug"; publicVariable "ETH_killzoneVisibleOnMap"; publicVariable "ETH_killzoneStyleColor"; publicVariable "ETH_killzoneStyleBrush"; publicVariable "ETH_killzoneStyleAlpha"; publicVariable "ETH_doctrinesLandMinefield"; publicVariable "ETH_ammoLandAP"; publicVariable "ETH_ammoLandAM"; publicVariable "ETH_doctrinesNavalMinefield"; publicVariable "ETH_ammoNavalAM"; publicVariable "ETH_doctrinesOXU"; publicVariable "ETH_ammoPackUXO"; publicVariable "ETH_cosmeticSmokesUXO"; publicVariable "ETH_doctrinesTraps"; publicVariable "ETH_ammoTrapBT"; publicVariable "ETH_globalDevicesIntensity"; publicVariable "ETH_globalRulesEthics"; publicVariable "ETH_globalRulesTopography"; publicVariable "ETH_A3_dynamicSim"; /* publicVariable "ETH_minesEditableByZeus"; */ publicVariable "ETH_prefix"; publicVariable "ETH_spacer"; publicVariable "ETH_txtDebugHeader"; publicVariable "ETH_txtWarnHeader";
+	publicVariable "ETH_isOn"; publicVariable "ETH_isOnDebug"; publicVariable "ETH_killzoneVisibleOnMap"; publicVariable "ETH_killzoneStyleColor"; publicVariable "ETH_killzoneStyleBrush"; publicVariable "ETH_killzoneStyleAlpha"; publicVariable "ETH_doctrinesLandMinefield"; publicVariable "ETH_ammoLandAP"; publicVariable "ETH_ammoLandAM"; publicVariable "ETH_doctrinesNavalMinefield"; publicVariable "ETH_ammoNavalAM"; publicVariable "ETH_doctrinesOXU"; publicVariable "ETH_ammoPackUXO"; publicVariable "ETH_cosmeticSmokesUXO"; publicVariable "ETH_doctrinesTraps"; publicVariable "ETH_ammoTrapBT"; publicVariable "ETH_globalDevicesIntensity"; publicVariable "ETH_globalRulesEthics"; publicVariable "ETH_globalRulesTopography"; publicVariable "ETH_A3_dynamicSim"; /* publicVariable "ETH_minesEditableByZeus"; */ publicVariable "ETH_prefix"; publicVariable "ETH_spacer"; publicVariable "ETH_txtDebugHeader"; publicVariable "ETH_txtWarnHeader"; publicVariable "ETH_confirmedKzMkrs";
 
 	// CAUTION: Never remove this sleep break!
 	sleep 1;
-	// IT HAPPENS AFTER THE MISSON STARTS:
+	// IT HAPPENS AFTER THE MISSION STARTS:
 	// Planting devices through the available kill zone:
-	{  // forEach _confirmedKzMkrs (part 2/2):
+	{  // forEach ETH_confirmedKzMkrs (part 2/2):
 		_eachConfirmedList = _x;
 		{  // forEach _eachConfirmedList:
 			// Check kill zones' size after symmetry acted:
@@ -110,13 +110,13 @@ ETH_isOn = true;                           // true = keep the script running in 
 			// Mine planter (slow process)
 			_deviceAmountsByDoctrine = [_kzNameStructure, ETH_ammoLandAP, ETH_ammoLandAM, ETH_ammoNavalAM, ETH_ammoPackUXO, ETH_ammoTrapBT, _x, _kzSize, _limiterDevicesKz, _deviceAmountsByDoctrine] call THY_fnc_ETH_device_planter;  // returns the mines' numbers updated.
 		} forEach _eachConfirmedList;
-	} forEach _confirmedKzMkrs;
+	} forEach ETH_confirmedKzMkrs;
 	// Debug purposes:
 	if ETH_isOnDebug then {
 		sleep 1;  // It fixes a bug in the final calc when too much devices;
 		systemChat format ["%1 > All confirmed kill zones are ready!", ETH_txtDebugHeader];
-		_kzAmountSide = count (_confirmedKzMkrs # 0);
-		_kzAmountUnknown = count (_confirmedKzMkrs # 1);
+		_kzAmountSide = count (ETH_confirmedKzMkrs # 0);
+		_kzAmountUnknown = count (ETH_confirmedKzMkrs # 1);
 	};
 	// Final balance:
 	_allDevicesPlantedAP  = (_deviceAmountsByDoctrine # 0) # 0;

@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.9
+// ETHICS MINEFIELDS v1.9.1
 // File: your_mission\ETHICSMinefields\fn_ETH_globalFunctions.sqf
 // Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 // by thy (@aldolammel)
@@ -40,14 +40,14 @@ THY_fnc_ETH_marker_name_splitter = {
 
 THY_fnc_ETH_marker_checker = {
 	// This function checks if the marker is inside map borders.
-	// Return _isValidMarker: bool.
+	// Return _isValidMkr: bool.
 
 	params ["_marker"];
-	private ["_isValidMarker", "_markerPos", "_markerPosA", "_markerPosB"];
+	private ["_isValidMkr", "_markerPos", "_markerPosA", "_markerPosB"];
 
 	// Debug txts:
 	// Initial values:
-	_isValidMarker = false;
+	_isValidMkr = false;
 	// Checking the marker position:
 	_markerPos  = getMarkerPos _marker;
 	_markerPosA = _markerPos # 0;
@@ -55,23 +55,23 @@ THY_fnc_ETH_marker_checker = {
 	// If marker is inside the map:
 	if ( (_markerPosA >= 0) && (_markerPosB >= 0) && (_markerPosA <= worldSize) && (_markerPosB <= worldSize) ) then {
 		// Update to return:
-		_isValidMarker = true;
+		_isValidMkr = true;
 	// Otherwise, if not on map area:
 	} else {
 		// Warning message:
 		systemChat format ["%1 Marker '%2' > This is in an invalid position and will be ignored until its position is within the map borders.", ETH_txtWarnHeader, _marker];
 	};
 	// Return:
-	_isValidMarker;
+	_isValidMkr;
 };
 
 
 THY_fnc_ETH_marker_scanner = {
 	// This function searches and appends in a list all area-markers confirmed as a real kill zone. The searching take place once right at the mission begins.
-	// Return: _confirmedKzMarkers: array [[area markers of sides], [area markers of unknown owner], [area markers of UXO]]
+	// Return: _confirmedKzMkrs: array [[area markers of sides], [area markers of unknown owner], [area markers of UXO]]
 
 	params ["_prefix", "_spacer"];
-	private ["_acceptableShapes", "_txt0", "_txt1", "_confirmedKzMarkers", "_confirmedKzUnknownMarkers", "_confirmedKzSideMkrs", "_isValidMarker", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzSide", "_isKzPresent", "_isNumber"];
+	private ["_acceptableShapes", "_txt0", "_txt1", "_confirmedKzMkrs", "_confirmedKzUnknownMkrs", "_confirmedKzSideMkrs", "_isValidMkr", "_possibleKzMarkers", "_kzNameStructure", "_kzDoctrine", "_kzSide", "_isKzPresent", "_isNumber"];
 
 	// Declarations:
 	_acceptableShapes = ["RECTANGLE", "ELLIPSE"];
@@ -79,19 +79,22 @@ THY_fnc_ETH_marker_scanner = {
 	_txt0 = "This mission still has no possible kill zone(s) to be loaded.";
 	_txt1 = format ["If the intension is to make it a kill zone, its structure name must be '%1%2TagDoctrine%2TagSide%2anynumber' or '%1%2TagDoctrine%2anynumber'.", _prefix, _spacer];
 	// Initial values:
-	_confirmedKzMarkers        = [];
-	_confirmedKzUnknownMarkers = [];
-	_confirmedKzSideMkrs       = [];
-	_isValidMarker             = false;
+	_confirmedKzMkrs        = [];
+	_confirmedKzUnknownMkrs = [];
+	_confirmedKzSideMkrs    = [];
+	_isValidMkr             = false;
 
 	// Step 1/2 > Creating a list with only area markers with right prefix:
 	// Selecting the relevant markers in a slightly different way. Now searching for all marker shapes:
 	_possibleKzMarkers = allMapMarkers select { _x find (_prefix + _spacer) isEqualTo 0 };
 	// Validating each marker position and shape:
 	{  // forEach _possibleKzMarkers:
-		_isValidMarker = [_x] call THY_fnc_ETH_marker_checker;
+		// Make all possible marker to get hidden globally if the coop mission has a briefing screen (singleplayer never has that screen):
+		// (If some minefield belongs to the player side, the fn_ETH_playerLocal.sqf will make it visible again case ETH_killzoneVisibleOnMap is true!)
+		_x setMarkerAlpha 0;
+		_isValidMkr = [_x] call THY_fnc_ETH_marker_checker;
 		// If something wrong, remove the marker from the list and from the map:
-		if ( !_isValidMarker || !((markerShape _x) in _acceptableShapes) ) then {
+		if ( !_isValidMkr || !((markerShape _x) in _acceptableShapes) ) then {
 			if ( !((markerShape _x) in _acceptableShapes) ) then {
 				systemChat format ["%1 Marker '%2' > This kill zone has NO a rectangle or ellipse shape to be considered to be populated with explosive devices.",
 				ETH_txtWarnHeader, _x];
@@ -101,7 +104,7 @@ THY_fnc_ETH_marker_scanner = {
 		};
 	} forEach _possibleKzMarkers;
 	// Error handling:
-	if ( count _possibleKzMarkers isEqualTo 0 ) exitWith { systemChat format ["%1 %2 %3", ETH_txtWarnHeader, _txt0, _txt1] };
+	if ( _possibleKzMarkers isEqualTo [] ) exitWith { systemChat format ["%1 %2 %3", ETH_txtWarnHeader, _txt0, _txt1] };
 
 	// Step 2/2 > Ignoring from the first list those area-markers that don't fit the name's structure rules, and creating new lists:
 	{  // forEach _possibleKzMarkers:
@@ -118,7 +121,7 @@ THY_fnc_ETH_marker_scanner = {
 				// If all validations alright:
 				if ( (_kzDoctrine isNotEqualTo "") && _isNumber ) then {
 					// If is a non-side kill zone marker:
-					_confirmedKzUnknownMarkers append [_x];
+					_confirmedKzUnknownMkrs append [_x];
 				};
 			};
 			// Case example: killzone_ap_ind_1   or   killzone_ap_75%_1
@@ -142,10 +145,10 @@ THY_fnc_ETH_marker_scanner = {
 				// Otherwise:
 				} else {
 					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
-					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
 				};
 			};
 			// Case example: killzone_ap_ind_75%_1
@@ -169,16 +172,16 @@ THY_fnc_ETH_marker_scanner = {
 				// Otherwise:
 				} else {
 					// If the doctrine is ON in management file and the kill zone doctrine is alright, add the kill zone in unknown list:
-					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
-					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMarkers append [_x] };
+					if ( ETH_doctrinesLandMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesNavalMinefield && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesTraps && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
+					if ( ETH_doctrinesOXU && (_kzDoctrine isNotEqualTo "") ) then { _confirmedKzUnknownMkrs append [_x] };
 				};
 			};
 		};
 	} forEach _possibleKzMarkers;
 	// Updating the general list to return:
-	_confirmedKzMarkers = [_confirmedKzSideMkrs, _confirmedKzUnknownMarkers];
+	_confirmedKzMkrs = [_confirmedKzSideMkrs, _confirmedKzUnknownMkrs];
 	// Debug messages:
 	if ETH_isOnDebug then {
 		// If at least one side area-marker was confirmed, show the message:
@@ -186,12 +189,12 @@ THY_fnc_ETH_marker_scanner = {
 			systemChat format ["%1 Side kill zone(s) ready to get explosives: %2", ETH_txtDebugHeader, _confirmedKzSideMkrs];
 		};
 		// If at least one unknown area-marker was confirmed, show the message:
-		if ( (count _confirmedKzUnknownMarkers) > 0 ) then {
-			systemChat format ["%1 Unknown kill zone(s) ready to get explosives: %2", ETH_txtDebugHeader, _confirmedKzUnknownMarkers];
+		if ( (count _confirmedKzUnknownMkrs) > 0 ) then {
+			systemChat format ["%1 Unknown kill zone(s) ready to get explosives: %2", ETH_txtDebugHeader, _confirmedKzUnknownMkrs];
 		};
 	};
 	// Returning:
-	_confirmedKzMarkers;
+	_confirmedKzMkrs;
 };
 
 
@@ -268,7 +271,7 @@ THY_fnc_ETH_presence_percentage_checker = {
 		// So delete it from the list to isolated that supposed to be just numbers:
 		_sectionChecker deleteAt (_sectionChecker find "%");
 		// If has no numbers in presence section, warning the editor:
-		if ( count _sectionChecker isEqualTo 0 ) then {
+		if ( _sectionChecker isEqualTo [] ) then {
 			systemChat format ["%1 %2", ETH_txtWarnHeader, _txt6];
 		// Otherwise, check the numbers:
 		} else {

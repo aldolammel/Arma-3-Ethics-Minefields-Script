@@ -1,4 +1,4 @@
-// ATTENCION: if you already have a initPlayerLocal.sqf file in your mission, just include the lines below in that file.
+// ATTENTION: if you already have a initPlayerLocal.sqf file in your mission, just include the lines below in that file.
 
 
 

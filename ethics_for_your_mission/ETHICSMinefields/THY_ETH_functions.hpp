@@ -1,4 +1,4 @@
-// ETHICS MINEFIELDS v1.9
+// ETHICS MINEFIELDS v1.9.1
 // File: your_mission\ETHICSMinefields\fn_ETH_functions.hpp
 // Documentation: https://github.com/aldolammel/Arma-3-Ethics-Minefields-Script/blob/main/_ETH_Script_Documentation.pdf
 // by thy (@aldolammel)
